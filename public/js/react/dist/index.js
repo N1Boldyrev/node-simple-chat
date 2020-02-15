@@ -35,6 +35,7 @@ function (_React$Component) {
     };
     _this.mouseOver = _this.mouseOver.bind(_assertThisInitialized(_this));
     _this.mouseOut = _this.mouseOut.bind(_assertThisInitialized(_this));
+    _this.singUp = _this.singUp.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -55,6 +56,45 @@ function (_React$Component) {
       });
     }
   }, {
+    key: "singUp",
+    value: function singUp() {
+      var login = document.getElementById('login').value;
+      var password = document.getElementById('password').value;
+
+      if (login == '' || password == '') {
+        var errorMsg = '';
+
+        if (login == '' && password == '') {
+          errorMsg = 'Login and password fields are empty';
+          document.getElementById('login').className = 'wrongInput';
+          document.getElementById('password').className = 'wrongInput';
+        } else if (login == '') {
+          errorMsg = 'Login field is epmpty or incorrect';
+          document.getElementById('login').className = 'wrongInput';
+        } else {
+          errorMsg = 'Password field is empty or incorrect';
+          document.getElementById('password').className = 'wrongInput';
+        }
+
+        document.getElementById('error').innerText = errorMsg;
+        document.getElementById('error').hidden = false;
+      } else {
+        postData('/signUp', {
+          login: login,
+          password: password
+        }).then(function (data) {
+          return console.log(JSON.stringify(data));
+        })["catch"](function (error) {
+          return console.log(error);
+        });
+      }
+    }
+  }, {
+    key: "inputValChanged",
+    value: function inputValChanged(id, classname) {
+      document.getElementById(id).className = classname;
+    }
+  }, {
     key: "render",
     value: function render() {
       return React.createElement("div", {
@@ -67,19 +107,30 @@ function (_React$Component) {
         type: "text",
         name: "",
         id: "login",
-        autoComplete: "off"
+        autoComplete: "off",
+        className: "login",
+        onChange: this.inputValChanged.bind(this, 'login', 'login')
       }), React.createElement("div", {
         id: "password_text"
       }, "Password"), React.createElement("input", {
         type: "password",
         name: "",
         id: "password",
-        autoComplete: "off"
+        autoComplete: "off",
+        className: "password",
+        onChange: this.inputValChanged.bind(this, 'password', 'password')
       }), React.createElement("br", null), React.createElement("button", {
         className: this.state.button_id,
         onMouseOver: this.mouseOver,
         onMouseOut: this.mouseOut
-      }, "Sign in"));
+      }, "Sign in"), React.createElement("div", {
+        className: "signUp"
+      }, React.createElement("a", {
+        onClick: this.singUp
+      }, "Sign up")), React.createElement("div", {
+        id: "error",
+        hidden: true
+      }));
     }
   }]);
 

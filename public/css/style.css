@@ -30,6 +30,7 @@ align-items: center;
 input{
     margin: 10px;
     padding-left: 5px;
+    padding: 5px;
     font-size: 20px;
 }
 
@@ -46,7 +47,12 @@ button{
     border-radius: 3%;
     color: white;
     margin-top: 20px;
-  
+}
+
+.wrongInput{
+    background-color: #FFDCE0;
+    outline: none;
+    border-color: #CEA0A5;
 }
 
 .signIn{
@@ -54,9 +60,23 @@ button{
     transition: linear 0.3s;
 }
 
+.signUp{
+    padding-top: 20px;
+}
+.signUp a{
+    color: #828282;
+    transition: linear 0.3s;
+}
+
+.signUp a:hover{
+    color: #535353 ;
+    cursor: pointer;
+}
+
 .button_hover{
     background-color: #3CB3A9;
     transition: linear 0.3s;
+    cursor: pointer;
 }
 
 .logo{
@@ -73,4 +93,11 @@ button{
     font-size: 40px;
     color: #3CB3A9;
     transition: linear 0.3s;
+}
+
+#error{
+    margin-top: 20px;
+    background-color: #FFDCE0;
+    padding: 10px;
+    border: 2px solid #CEA0A5;
 }
