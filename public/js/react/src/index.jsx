@@ -8,7 +8,8 @@ class LoginScreen extends React.Component{
 
         this.mouseOver = this.mouseOver.bind(this);
         this.mouseOut = this.mouseOut.bind(this);
-        this.singUp = this.singUp.bind(this);
+        this.signUp = this.signUp.bind(this);
+        this.signIn = this.signIn.bind(this);
     }
 
 
@@ -27,35 +28,80 @@ class LoginScreen extends React.Component{
     };
 
 
-    singUp(){
-        let login = document.getElementById('login').value;
-        let password = document.getElementById('password').value;
-        if(login == '' || password == ''){
-            let errorMsg = '';
-            
-            if(login == '' && password == ''){
-                errorMsg = 'Login and password fields are empty';
-                document.getElementById('login').className = 'wrongInput';
-                document.getElementById('password').className = 'wrongInput';
-            }
-            else if(login == ''){
-                errorMsg = 'Login field is epmpty or incorrect';
-                document.getElementById('login').className = 'wrongInput';
-        }
-            else{ 
-                errorMsg = 'Password field is empty or incorrect';
-                document.getElementById('password').className = 'wrongInput';
-        }
+    fieldsFill(login, password, message){
+            if(login.value == '' || password.value == ''){
+                let errorMsg = '';
 
-            document.getElementById('error').innerText = errorMsg;
-            document.getElementById('error').hidden = false;
-        }else{
-            postData('/signUp', {login: login, password: password})
-            .then(data => console.log(JSON.stringify(data)))
+                if(login.value == '' && password.value == ''){
+                    errorMsg = 'Login and password fields are empty';
+                    login.className = 'wrongInput';
+                    password.className = 'wrongInput';
+                }
+                else if(login.value == ''){
+                    errorMsg = 'Login field is epmpty or incorrect';
+                    login.className = 'wrongInput';
+            }
+                else{ 
+                    errorMsg = 'Password field is empty or incorrect';
+                    password.className = 'wrongInput';
+            }
+
+                message.innerText = errorMsg;
+                message.className = 'errorMessage';
+                message.hidden = false;
+                return false;
+            }
+                else return true;
+    }
+
+    signUp(){
+        let login = document.getElementById('login');
+        let password = document.getElementById('password');
+        let message = document.getElementById('message');
+        if(this.fieldsFill(login, password, message) == true)
+        {
+            postData('/signUp', {login: login.value, password: password.value})
+            .then(data => {
+                if(data.status == "already exists"){
+                    message.className = 'errorMessage';
+                    message.innerText = 'User already exist';
+                    login.className = 'wrongInput';
+                    password.className = 'wrongInput';
+                }
+                else if(data.status == 'ok'){
+                    message.className = 'successMessage';
+                    message.innerText = 'You was rigistrated, try to sign in';
+                }
+                else throw new Error("Server error");
+                login.value = '';
+                password.value = '';
+                message.hidden = false;
+            })
             .catch(error => console.log(error));
         }
     }
 
+    signIn(){
+        let login = document.getElementById('login');
+        let password = document.getElementById('password');
+        let message = document.getElementById('message');
+        if(this.fieldsFill(login, password, message) == true){
+            postData('/signIn', {login: login.value, password: password.value})
+            .then(data => {
+                console.log(data);
+                if(data.validation == false){
+                    message.className = 'errorMessage';
+                    message.innerText = 'Invalid Login or Password';
+                    message.hidden = false;
+                }else{
+                    document.location.href = '/mainPage';
+                }
+            })
+        }
+
+
+        
+    }
 
     inputValChanged(id, classname){
         document.getElementById(id).className = classname;
@@ -71,9 +117,9 @@ class LoginScreen extends React.Component{
                  <div id='password_text'>Password</div>
                  <input type="password" name="" id="password" autoComplete = 'off' className = 'password' onChange = {this.inputValChanged.bind(this,'password','password')}/>
                  <br/>
-                 <button className={this.state.button_id} onMouseOver = {this.mouseOver} onMouseOut = {this.mouseOut}>Sign in</button>
-                 <div className="signUp"><a onClick = {this.singUp}>Sign up</a></div>
-                 <div id="error" hidden = {true}></div>
+                 <button className={this.state.button_id} onMouseOver = {this.mouseOver} onMouseOut = {this.mouseOut} onClick = {this.signIn}>Sign in</button>
+                 <div className="signUp"><a onClick = {this.signUp}>Sign up</a></div>
+                 <div id="message" hidden = {true}></div>
              </div>
         );
     };

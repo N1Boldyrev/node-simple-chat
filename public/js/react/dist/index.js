@@ -35,7 +35,8 @@ function (_React$Component) {
     };
     _this.mouseOver = _this.mouseOver.bind(_assertThisInitialized(_this));
     _this.mouseOut = _this.mouseOut.bind(_assertThisInitialized(_this));
-    _this.singUp = _this.singUp.bind(_assertThisInitialized(_this));
+    _this.signUp = _this.signUp.bind(_assertThisInitialized(_this));
+    _this.signIn = _this.signIn.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -56,36 +57,80 @@ function (_React$Component) {
       });
     }
   }, {
-    key: "singUp",
-    value: function singUp() {
-      var login = document.getElementById('login').value;
-      var password = document.getElementById('password').value;
-
-      if (login == '' || password == '') {
+    key: "fieldsFill",
+    value: function fieldsFill(login, password, message) {
+      if (login.value == '' || password.value == '') {
         var errorMsg = '';
 
-        if (login == '' && password == '') {
+        if (login.value == '' && password.value == '') {
           errorMsg = 'Login and password fields are empty';
-          document.getElementById('login').className = 'wrongInput';
-          document.getElementById('password').className = 'wrongInput';
-        } else if (login == '') {
+          login.className = 'wrongInput';
+          password.className = 'wrongInput';
+        } else if (login.value == '') {
           errorMsg = 'Login field is epmpty or incorrect';
-          document.getElementById('login').className = 'wrongInput';
+          login.className = 'wrongInput';
         } else {
           errorMsg = 'Password field is empty or incorrect';
-          document.getElementById('password').className = 'wrongInput';
+          password.className = 'wrongInput';
         }
 
-        document.getElementById('error').innerText = errorMsg;
-        document.getElementById('error').hidden = false;
-      } else {
+        message.innerText = errorMsg;
+        message.className = 'errorMessage';
+        message.hidden = false;
+        return false;
+      } else return true;
+    }
+  }, {
+    key: "signUp",
+    value: function signUp() {
+      var login = document.getElementById('login');
+      var password = document.getElementById('password');
+      var message = document.getElementById('message');
+
+      if (this.fieldsFill(login, password, message) == true) {
         postData('/signUp', {
-          login: login,
-          password: password
+          login: login.value,
+          password: password.value
         }).then(function (data) {
-          return console.log(JSON.stringify(data));
+          if (data.status == "already exists") {
+            message.className = 'errorMessage';
+            message.innerText = 'User already exist';
+            login.className = 'wrongInput';
+            password.className = 'wrongInput';
+          } else if (data.status == 'ok') {
+            message.className = 'successMessage';
+            message.innerText = 'You was rigistrated, try to sign in';
+          } else throw new Error("Server error");
+
+          login.value = '';
+          password.value = '';
+          message.hidden = false;
         })["catch"](function (error) {
           return console.log(error);
+        });
+      }
+    }
+  }, {
+    key: "signIn",
+    value: function signIn() {
+      var login = document.getElementById('login');
+      var password = document.getElementById('password');
+      var message = document.getElementById('message');
+
+      if (this.fieldsFill(login, password, message) == true) {
+        postData('/signIn', {
+          login: login.value,
+          password: password.value
+        }).then(function (data) {
+          console.log(data);
+
+          if (data.validation == false) {
+            message.className = 'errorMessage';
+            message.innerText = 'Invalid Login or Password';
+            message.hidden = false;
+          } else {
+            document.location.href = '/mainPage';
+          }
         });
       }
     }
@@ -122,13 +167,14 @@ function (_React$Component) {
       }), React.createElement("br", null), React.createElement("button", {
         className: this.state.button_id,
         onMouseOver: this.mouseOver,
-        onMouseOut: this.mouseOut
+        onMouseOut: this.mouseOut,
+        onClick: this.signIn
       }, "Sign in"), React.createElement("div", {
         className: "signUp"
       }, React.createElement("a", {
-        onClick: this.singUp
+        onClick: this.signUp
       }, "Sign up")), React.createElement("div", {
-        id: "error",
+        id: "message",
         hidden: true
       }));
     }
