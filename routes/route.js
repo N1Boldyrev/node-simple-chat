@@ -1,7 +1,14 @@
 const bodyParser = require('./bodyParser');
 module.exports = function(app, db){
     app.get('/',(req,res,next) =>{
-        res.render('index');
+        if(req.cookies.login != undefined)
+            next();
+        else
+            res.render('index');
+    });
+
+    app.get('/', (req, res) => {
+        res.render('main');
     });
 
     app.post('/signUp', bodyParser.jsonParser,(req, res) =>{
@@ -29,14 +36,12 @@ module.exports = function(app, db){
         let cursor = collection.find({"login" : user.login, "password": user.password});
         cursor.toArray((err, results) =>{
             console.log(results.length);
-            if(results.length == 1)
+            if(results.length == 1){
+                res.cookie('login' , user.login);
                 res.send({validation : true});
+            }
             else 
                 res.send({validation: false});
         });
-    });
-
-    app.get('/mainPage', (req, res) => {
-        res.render('main');
     });
 }

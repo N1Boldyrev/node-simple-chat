@@ -88,13 +88,14 @@ class LoginScreen extends React.Component{
         if(this.fieldsFill(login, password, message) == true){
             postData('/signIn', {login: login.value, password: password.value})
             .then(data => {
-                console.log(data);
                 if(data.validation == false){
                     message.className = 'errorMessage';
                     message.innerText = 'Invalid Login or Password';
+                    login.value = '';
+                    password.value = '';
                     message.hidden = false;
                 }else{
-                    document.location.href = '/mainPage';
+                    document.location.href = '/';
                 }
             })
         }

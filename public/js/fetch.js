@@ -8,3 +8,8 @@ function postData(url = '', data = {}) {
     })
     .then(response => response.json()); // парсит JSON ответ в Javascript объект
 }
+
+function getData(url){
+        return fetch(url)
+        .then(response => response.json());
+}

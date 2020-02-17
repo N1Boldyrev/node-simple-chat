@@ -1,0 +1,57 @@
+body{
+    font-family: 'Roboto', sans-serif;
+    padding: 0;
+    margin: 0;
+    background: rgb(58,180,168);
+    background: linear-gradient(90deg, rgba(58,180,168,1) 0%, rgba(207,69,252,1) 100%);
+}
+.headder{
+    display: flex;
+    justify-content: space-around;
+    background: white;
+    margin: 0 12%;
+    border-radius: 0 0 40px 40px;
+}
+
+.logo{
+    padding-left: 60px;
+    font-size: 40px;
+    font-family: 'Lobster', cursive;
+    color: #A762E5;
+    transition: linear 0.3s;
+}
+
+.logo:hover{
+    color: #3AB4A8 ;
+    cursor: pointer;
+}
+
+.username{
+    margin-left: 1000px;
+    padding-top: 15px;
+    font-size: 20px;
+}
+
+.username:hover{
+    cursor: default;
+}
+
+.signOut{
+    padding-right: 30px;
+    padding-top: 8px;
+}
+
+.signOut button{
+    font-size: 20px;
+    padding: 6px;
+    background-color: #3AB4A8;
+    border-radius: 3px;
+    border: none;
+    color: white;
+    transition: linear 0.3s;
+}
+
+.signOut button:hover{
+    background-color: #A762E5;
+    cursor: pointer;
+}

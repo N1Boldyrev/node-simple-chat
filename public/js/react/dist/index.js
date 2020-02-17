@@ -122,14 +122,14 @@ function (_React$Component) {
           login: login.value,
           password: password.value
         }).then(function (data) {
-          console.log(data);
-
           if (data.validation == false) {
             message.className = 'errorMessage';
             message.innerText = 'Invalid Login or Password';
+            login.value = '';
+            password.value = '';
             message.hidden = false;
           } else {
-            document.location.href = '/mainPage';
+            document.location.href = '/';
           }
         });
       }
