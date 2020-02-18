@@ -1,8 +1,9 @@
 const bodyParser = require('./bodyParser');
 module.exports = function(app, db){
     app.get('/',(req,res,next) =>{
-        if(req.cookies.login != undefined)
+        if(req.cookies.login != undefined && req.cookies.login != ""){
             next();
+        }
         else
             res.render('index');
     });
@@ -35,7 +36,6 @@ module.exports = function(app, db){
         let collection = db.db('MeChat').collection('users');
         let cursor = collection.find({"login" : user.login, "password": user.password});
         cursor.toArray((err, results) =>{
-            console.log(results.length);
             if(results.length == 1){
                 res.cookie('login' , user.login);
                 res.send({validation : true});

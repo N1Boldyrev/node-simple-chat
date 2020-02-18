@@ -1,4 +1,5 @@
-let loginSplit = document.cookie.split('=');
+let loginSplit = document.cookie.split(';');
+loginSplit = loginSplit[0].split('=');
 
 class Headder extends React.Component{
     constructor(props){
@@ -6,14 +7,21 @@ class Headder extends React.Component{
         this.state = {
 
         };
+
+        this.signOut = this.signOut.bind(this);
     };
+
+    signOut(){
+        document.cookie = "login=";
+        document.location.href = "/";
+    }
         
         render() {
             return (
                  <div className="headder">
                      <div className="logo">MeChat</div>
                      <div className="username">{loginSplit[1]}</div>
-                     <div className="signOut"><button>Sign out</button></div>
+                     <div className="signOut" onClick = {this.signOut}><button>Sign out</button></div>
                  </div>
             );
         }
@@ -22,7 +30,10 @@ class Headder extends React.Component{
 class UsersLsit extends React.Component{
     constructor(props){
         super(props);
-        this.state = {list: "kal",suka: "fefeae"};
+        this.state = {
+            list:"", 
+            activeUser: ""
+        };
     }
 
     componentDidMount(){
@@ -30,16 +41,99 @@ class UsersLsit extends React.Component{
         let users = getData('/UsersList')
         .then(data => {
             for(let key in data){
-                userList.push(<div key = {data[key]._id}>{data[key].login}</div>);
-                this.setState({list: userList});
+                if(loginSplit[1] != data[key].login){
+                userList.push(<div key = {data[key]._id} id = {data[key].login} onClick = {this.userChange.bind(this, data[key].login)} className = "user">{data[key].login}</div>);
+                }
             }
+            this.setState({list: userList});
         });
+    }
+
+    userChange(id){
+        if(this.state.activeUser != ""){
+            document.getElementById(this.state.activeUser).className = "User";
+        }
+            document.getElementById(id).className = "UserClicked";
+            this.setState({activeUser: id});
     }
 
     render() {
         return (
-            <div className="usersList">   
+            <div className = "content">
+                 <div className="usersList">   
                    {this.state.list}
+                </div>
+                 <Chat otherUser = {this.state.activeUser} />
+            </div>
+        );
+    }
+}
+
+
+class Chat extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            messages: <div className = "messageCover">The history of messages will be displayed here.</div>,
+            destination:""
+        };
+
+        this.sendMessage = this.sendMessage.bind(this);
+    }
+
+    componentDidUpdate(prevProps){
+        if(this.props.otherUser !== prevProps.otherUser){
+            this.getMessages();
+        }
+    }
+
+    getMessages(){
+        let destination = this.props.otherUser;
+            document.cookie = `destination=${destination}`;
+            console.log(document.cookie);
+            let messagesList = [];
+            let messages = getData('/messages')
+            .then(data =>{
+                for(let key in data){
+                    let classNameMessage = '';
+                    if(data[key].wasRead == false){
+                        classNameMessage = 'message unread';
+                    }
+                    else{
+                        classNameMessage = 'message';
+                    }
+                messagesList.push(<div key = {data[key]._id} className = {classNameMessage}>
+                    <div className= "messageUsername">{data[key].sender}</div>
+                    <div className="messageText">{data[key].message}</div>
+                </div>);
+                }
+                this.setState({messages: messagesList});
+            });
+    }
+
+
+    sendMessage(){
+        let messageText = document.getElementById('messageText');
+        let destination = this.props.otherUser;
+        if(destination != ''){
+            postData('/sendMessage', {messageText: messageText.value, destination: destination})
+            .then(data => {
+                    if(data.response == 'ok'){
+                        messageText.value = '';
+                        this.getMessages();
+                    }
+            });
+        }
+    }
+
+    render() {
+        return (
+             <div className="chat">
+                 <div className="messages">{this.state.messages}</div>
+                 <div className="messageSender">
+                <textarea name="" id="messageText" cols="60" rows="2" className="messageText"></textarea>
+                <button className="sendButton" onClick = {this.sendMessage}>></button>
+                 </div>
              </div>
         );
     }
@@ -47,7 +141,7 @@ class UsersLsit extends React.Component{
 
 
 ReactDOM.render(
-    <div>
+    <div className = "wrapper">
         <Headder/>
         <UsersLsit/>
     </div>,

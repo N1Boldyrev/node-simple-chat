@@ -10,15 +10,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var loginSplit = document.cookie.split('=');
+var loginSplit = document.cookie.split(';');
+loginSplit = loginSplit[0].split('=');
 
 var Headder =
 /*#__PURE__*/
@@ -32,10 +33,17 @@ function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Headder).call(this, props));
     _this.state = {};
+    _this.signOut = _this.signOut.bind(_assertThisInitialized(_this));
     return _this;
   }
 
   _createClass(Headder, [{
+    key: "signOut",
+    value: function signOut() {
+      document.cookie = "login=";
+      document.location.href = "/";
+    }
+  }, {
     key: "render",
     value: function render() {
       return React.createElement("div", {
@@ -45,7 +53,8 @@ function (_React$Component) {
       }, "MeChat"), React.createElement("div", {
         className: "username"
       }, loginSplit[1]), React.createElement("div", {
-        className: "signOut"
+        className: "signOut",
+        onClick: this.signOut
       }, React.createElement("button", null, "Sign out")));
     }
   }]);
@@ -67,8 +76,8 @@ function (_React$Component2) {
 
     _this2 = _possibleConstructorReturn(this, _getPrototypeOf(UsersLsit).call(this, props));
     _this2.state = {
-      list: "kal",
-      suka: "fefeae"
+      list: "",
+      activeUser: ""
     };
     return _this2;
   }
@@ -81,26 +90,157 @@ function (_React$Component2) {
       var userList = [];
       var users = getData('/UsersList').then(function (data) {
         for (var key in data) {
-          userList.push(React.createElement("div", {
-            key: data[key]._id
-          }, data[key].login));
-
-          _this3.setState({
-            list: userList
-          });
+          if (loginSplit[1] != data[key].login) {
+            userList.push(React.createElement("div", {
+              key: data[key]._id,
+              id: data[key].login,
+              onClick: _this3.userChange.bind(_this3, data[key].login),
+              className: "user"
+            }, data[key].login));
+          }
         }
+
+        _this3.setState({
+          list: userList
+        });
+      });
+    }
+  }, {
+    key: "userChange",
+    value: function userChange(id) {
+      if (this.state.activeUser != "") {
+        document.getElementById(this.state.activeUser).className = "User";
+      }
+
+      document.getElementById(id).className = "UserClicked";
+      this.setState({
+        activeUser: id
       });
     }
   }, {
     key: "render",
     value: function render() {
       return React.createElement("div", {
+        className: "content"
+      }, React.createElement("div", {
         className: "usersList"
-      }, this.state.list);
+      }, this.state.list), React.createElement(Chat, {
+        otherUser: this.state.activeUser
+      }));
     }
   }]);
 
   return UsersLsit;
 }(React.Component);
 
-ReactDOM.render(React.createElement("div", null, React.createElement(Headder, null), React.createElement(UsersLsit, null)), document.getElementById("root"));
+var Chat =
+/*#__PURE__*/
+function (_React$Component3) {
+  _inherits(Chat, _React$Component3);
+
+  function Chat(props) {
+    var _this4;
+
+    _classCallCheck(this, Chat);
+
+    _this4 = _possibleConstructorReturn(this, _getPrototypeOf(Chat).call(this, props));
+    _this4.state = {
+      messages: React.createElement("div", {
+        className: "messageCover"
+      }, "The history of messages will be displayed here."),
+      destination: ""
+    };
+    _this4.sendMessage = _this4.sendMessage.bind(_assertThisInitialized(_this4));
+    return _this4;
+  }
+
+  _createClass(Chat, [{
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps) {
+      if (this.props.otherUser !== prevProps.otherUser) {
+        this.getMessages();
+      }
+    }
+  }, {
+    key: "getMessages",
+    value: function getMessages() {
+      var _this5 = this;
+
+      var destination = this.props.otherUser;
+      document.cookie = "destination=".concat(destination);
+      console.log(document.cookie);
+      var messagesList = [];
+      var messages = getData('/messages').then(function (data) {
+        for (var key in data) {
+          var classNameMessage = '';
+
+          if (data[key].wasRead == false) {
+            classNameMessage = 'message unread';
+          } else {
+            classNameMessage = 'message';
+          }
+
+          messagesList.push(React.createElement("div", {
+            key: data[key]._id,
+            className: classNameMessage
+          }, React.createElement("div", {
+            className: "messageUsername"
+          }, data[key].sender), React.createElement("div", {
+            className: "messageText"
+          }, data[key].message)));
+        }
+
+        _this5.setState({
+          messages: messagesList
+        });
+      });
+    }
+  }, {
+    key: "sendMessage",
+    value: function sendMessage() {
+      var _this6 = this;
+
+      var messageText = document.getElementById('messageText');
+      var destination = this.props.otherUser;
+
+      if (destination != '') {
+        postData('/sendMessage', {
+          messageText: messageText.value,
+          destination: destination
+        }).then(function (data) {
+          if (data.response == 'ok') {
+            messageText.value = '';
+
+            _this6.getMessages();
+          }
+        });
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return React.createElement("div", {
+        className: "chat"
+      }, React.createElement("div", {
+        className: "messages"
+      }, this.state.messages), React.createElement("div", {
+        className: "messageSender"
+      }, React.createElement("textarea", {
+        name: "",
+        id: "messageText",
+        cols: "60",
+        rows: "2",
+        className: "messageText"
+      }), React.createElement("button", {
+        className: "sendButton",
+        onClick: this.sendMessage
+      }, ">")));
+    }
+  }]);
+
+  return Chat;
+}(React.Component);
+
+ReactDOM.render(React.createElement("div", {
+  className: "wrapper"
+}, React.createElement(Headder, null), React.createElement(UsersLsit, null)), document.getElementById("root"));

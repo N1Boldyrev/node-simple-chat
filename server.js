@@ -22,6 +22,6 @@ app.use(cookieParser());
 MongoClient.connect(dbUrl, (err, database) => {
     if(err) return console.log(err);
     require('./routes/route')(app, database);
-    require('./routes/main')(app,database);
+    require('./routes/mainPageRoute')(app,database);
     app.listen(port, () => console.log(`Server start on port ${port}`));
 });
