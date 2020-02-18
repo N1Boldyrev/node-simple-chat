@@ -81,6 +81,18 @@ class Chat extends React.Component{
         this.sendMessage = this.sendMessage.bind(this);
     }
 
+   /* componentDidMount(){
+        this.updateInterval = setInterval(() => {
+            this.getMessages();
+        }, 2500);
+    }
+
+
+    componentWillUnmount(){
+        clearInterval(this.updateInterval);
+    }
+    */
+
     componentDidUpdate(prevProps){
         if(this.props.otherUser !== prevProps.otherUser){
             this.getMessages();
@@ -90,14 +102,20 @@ class Chat extends React.Component{
     getMessages(){
         let destination = this.props.otherUser;
             document.cookie = `destination=${destination}`;
-            console.log(document.cookie);
             let messagesList = [];
             let messages = getData('/messages')
             .then(data =>{
                 for(let key in data){
                     let classNameMessage = '';
-                    if(data[key].wasRead == false){
+                    if(data[key].wasRead == false && data[key].sender == loginSplit[1]){
                         classNameMessage = 'message unread';
+                    }
+                    else if(data[key].wasRead == false && data[key].sender != loginSplit[1]){
+                        postData('/wasRead',{id: data[key]._id, sender: data[key].sender}).then(data => {
+                            if(data.response == 'ok'){
+                                this.getMessages();
+                            }
+                        });
                     }
                     else{
                         classNameMessage = 'message';

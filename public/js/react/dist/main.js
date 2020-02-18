@@ -155,6 +155,20 @@ function (_React$Component3) {
   }
 
   _createClass(Chat, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this5 = this;
+
+      this.updateInterval = setInterval(function () {
+        _this5.getMessages();
+      }, 1000);
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      clearInterval(this.updateInterval);
+    }
+  }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate(prevProps) {
       if (this.props.otherUser !== prevProps.otherUser) {
@@ -164,18 +178,30 @@ function (_React$Component3) {
   }, {
     key: "getMessages",
     value: function getMessages() {
-      var _this5 = this;
+      var _this6 = this;
 
       var destination = this.props.otherUser;
       document.cookie = "destination=".concat(destination);
-      console.log(document.cookie);
       var messagesList = [];
       var messages = getData('/messages').then(function (data) {
+        console.log(data);
+
         for (var key in data) {
           var classNameMessage = '';
 
-          if (data[key].wasRead == false) {
+          if (data[key].wasRead == false && data[key].sender == loginSplit[1]) {
             classNameMessage = 'message unread';
+          } else if (data[key].wasRead == false && data[key].sender != loginSplit[1]) {
+            postData('/wasRead', {
+              id: data[key]._id,
+              sender: data[key].sender
+            }).then(function (data) {
+              console.log(data.response);
+
+              if (data.response == 'ok') {
+                _this6.getMessages();
+              }
+            });
           } else {
             classNameMessage = 'message';
           }
@@ -190,7 +216,7 @@ function (_React$Component3) {
           }, data[key].message)));
         }
 
-        _this5.setState({
+        _this6.setState({
           messages: messagesList
         });
       });
@@ -198,7 +224,7 @@ function (_React$Component3) {
   }, {
     key: "sendMessage",
     value: function sendMessage() {
-      var _this6 = this;
+      var _this7 = this;
 
       var messageText = document.getElementById('messageText');
       var destination = this.props.otherUser;
@@ -211,7 +237,7 @@ function (_React$Component3) {
           if (data.response == 'ok') {
             messageText.value = '';
 
-            _this6.getMessages();
+            _this7.getMessages();
           }
         });
       }

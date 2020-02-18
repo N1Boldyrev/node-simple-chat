@@ -1,6 +1,7 @@
 const express = require('express');
 const mustacheExpress = require('mustache-express');
 const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectID;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
@@ -22,6 +23,6 @@ app.use(cookieParser());
 MongoClient.connect(dbUrl, (err, database) => {
     if(err) return console.log(err);
     require('./routes/route')(app, database);
-    require('./routes/mainPageRoute')(app,database);
+    require('./routes/mainPageRoute')(app,database, ObjectId);
     app.listen(port, () => console.log(`Server start on port ${port}`));
 });

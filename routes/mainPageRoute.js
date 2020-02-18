@@ -1,5 +1,5 @@
 const bodyParser = require('./bodyParser');
-module.exports = function(app, db){
+module.exports = function(app, db, ObjectId){
     app.get('/UsersList', (req, res) => {
         let collection = db.db('MeChat').collection('users');
         let users = collection.find({}, {projection: {password: false}});
@@ -30,5 +30,16 @@ module.exports = function(app, db){
             if(err) res.send({response: "Error"})
             else res.send({response: "ok"});
         });
-    })
+    });
+
+    app.post('/wasRead', bodyParser.jsonParser, (req, res) =>{
+        let collection = db.db('MeChat').collection('messages');
+        console.log(req.body.id);
+        if(req.body.sender != req.cookies.login){
+        let wasRead = collection.update({_id: new ObjectId(req.body.id)}, {$set:{wasRead: true}}, (err,result) => {
+            if(err) res.send({response: "Error"})
+            else res.send({response: "ok"});
+        });
+    }
+    });
 }
