@@ -1,5 +1,13 @@
 const bodyParser = require('./bodyParser');
-module.exports = function(app, db, ObjectId){
+const events = require("events");
+let emitter = new events.EventEmitter();
+module.exports = function(app, db, ObjectId, webSocket){
+    let connectedUsers = [];
+   
+    app.get('/', (req, res) => {
+        res.render('main');
+    });
+    
     app.get('/UsersList', (req, res) => {
         let collection = db.db('MeChat').collection('users');
         let users = collection.find({}, {projection: {password: false}});
@@ -8,33 +16,60 @@ module.exports = function(app, db, ObjectId){
         });
     });
 
+
+    webSocket.on('connection', ws =>{
+        ws.on('message', message => {
+            message = JSON.parse(message);
+            if(message.operation == "User connect"){
+                connectedUsers.push({login: message.login, ws: ws});
+            }
+            else if(message.operation == "Send message"){
+                for(let key in connectedUsers){
+                    if(connectedUsers[key].login == message.destination){
+                        connectedUsers[key].ws.send(JSON.stringify(message));
+                    }
+                }
+            }
+        });
+        ws.on('close', () =>{
+            for(let key in connectedUsers){
+                if(connectedUsers[key].ws == ws) connectedUsers.splice(key,1);
+            }
+        })
+    });
+
     app.get('/messages', (req,res) => {
         let destination = req.cookies.destination;
         let login = req.cookies.login;
         let collection = db.db('MeChat').collection('messages');
         let messages = collection.find({$and:[{users: destination}, {users: login}]});
-        messages.toArray((err, results) => {
-            res.send(results);
-        });
+            messages.toArray((err, results) => {
+                if(results.length == 0){
+                    res.send({response:'Empty'});
+                }
+                else{
+                res.send(results); 
+        }
+            });
     });
 
     app.post('/sendMessage', bodyParser.jsonParser, (req, res) => {
         let sender = req.cookies.login;
         let getter = req.body.destination;
         let message = req.body.messageText; 
-
         let insertMessage = {users: [sender, getter], message: message, sender: sender, wasRead: false};
 
         let collection = db.db('MeChat').collection('messages');
         let sendMessage = collection.insert(insertMessage, (err, result) =>{
             if(err) res.send({response: "Error"})
-            else res.send({response: "ok"});
+            else{
+                res.send({response: "ok"});
+            } 
         });
     });
 
     app.post('/wasRead', bodyParser.jsonParser, (req, res) =>{
         let collection = db.db('MeChat').collection('messages');
-        console.log(req.body.id);
         if(req.body.sender != req.cookies.login){
         let wasRead = collection.update({_id: new ObjectId(req.body.id)}, {$set:{wasRead: true}}, (err,result) => {
             if(err) res.send({response: "Error"})
@@ -42,4 +77,5 @@ module.exports = function(app, db, ObjectId){
         });
     }
     });
+
 }

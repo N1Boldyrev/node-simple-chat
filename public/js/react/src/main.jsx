@@ -1,5 +1,6 @@
 let loginSplit = document.cookie.split(';');
 loginSplit = loginSplit[0].split('=');
+let tmpMessageList = [];
 
 class Headder extends React.Component{
     constructor(props){
@@ -32,7 +33,8 @@ class UsersLsit extends React.Component{
         super(props);
         this.state = {
             list:"", 
-            activeUser: ""
+            activeUser: "",
+            socket: new WebSocket('ws://localhost:3001')
         };
     }
 
@@ -42,7 +44,9 @@ class UsersLsit extends React.Component{
         .then(data => {
             for(let key in data){
                 if(loginSplit[1] != data[key].login){
-                userList.push(<div key = {data[key]._id} id = {data[key].login} onClick = {this.userChange.bind(this, data[key].login)} className = "user">{data[key].login}</div>);
+                userList.push(<div key = {data[key]._id} id = {data[key].login} onClick = {this.userChange.bind(this, data[key].login)} className = "user">
+                    {data[key].login}
+                    </div>);
                 }
             }
             this.setState({list: userList});
@@ -63,7 +67,7 @@ class UsersLsit extends React.Component{
                  <div className="usersList">   
                    {this.state.list}
                 </div>
-                 <Chat otherUser = {this.state.activeUser} />
+                 <Chat otherUser = {this.state.activeUser}  socket = {this.state.socket}/>
             </div>
         );
     }
@@ -75,23 +79,32 @@ class Chat extends React.Component{
         super(props);
         this.state = {
             messages: <div className = "messageCover">The history of messages will be displayed here.</div>,
-            destination:""
+            destination:"",
+            socket: props.socket,
+            test: 0
         };
 
         this.sendMessage = this.sendMessage.bind(this);
     }
 
-   /* componentDidMount(){
-        this.updateInterval = setInterval(() => {
-            this.getMessages();
-        }, 2500);
+    componentDidMount(){
+        this.state.socket.onopen = () =>{
+            this.state.socket.send(JSON.stringify({login: loginSplit[1], operation: "User connect"}));
+            this.state.socket.onmessage = message => {
+               let data = JSON.parse(message.data);
+               if(data.operation == "Send message" && this.props.otherUser == data.sender){ //Если пользователь на странице диалога с отправителем сообщения
+                    let newMessage = <div className = "message" key = {Math.random()}>
+                        <div className= "messageUsername">{data.sender}</div>
+                        <div className="messageText">{data.message}</div>
+                    </div>;
+                    tmpMessageList.push(newMessage);
+                    this.setState({
+                        messages: tmpMessageList
+                    });
+               }
+            };
+        }
     }
-
-
-    componentWillUnmount(){
-        clearInterval(this.updateInterval);
-    }
-    */
 
     componentDidUpdate(prevProps){
         if(this.props.otherUser !== prevProps.otherUser){
@@ -100,32 +113,25 @@ class Chat extends React.Component{
     }
 
     getMessages(){
-        let destination = this.props.otherUser;
+            let destination = this.props.otherUser;
+            tmpMessageList = [];
             document.cookie = `destination=${destination}`;
-            let messagesList = [];
             let messages = getData('/messages')
             .then(data =>{
-                for(let key in data){
-                    let classNameMessage = '';
-                    if(data[key].wasRead == false && data[key].sender == loginSplit[1]){
-                        classNameMessage = 'message unread';
-                    }
-                    else if(data[key].wasRead == false && data[key].sender != loginSplit[1]){
-                        postData('/wasRead',{id: data[key]._id, sender: data[key].sender}).then(data => {
-                            if(data.response == 'ok'){
-                                this.getMessages();
-                            }
-                        });
-                    }
-                    else{
-                        classNameMessage = 'message';
-                    }
-                messagesList.push(<div key = {data[key]._id} className = {classNameMessage}>
-                    <div className= "messageUsername">{data[key].sender}</div>
-                    <div className="messageText">{data[key].message}</div>
-                </div>);
+                if(data.response == "Empty"){
+                    this.setState({messages: <div className = "messageCover">The history of messages will be displayed here.</div>});
                 }
-                this.setState({messages: messagesList});
+                else{
+                    for(let key in data){
+                        tmpMessageList.push(<div key = {data[key]._id} className = "message">
+                        <div className= "messageUsername">{data[key].sender}</div>
+                        <div className="messageText">{data[key].message}</div>
+                    </div>);
+                    this.setState({
+                        messages: tmpMessageList,
+                    });
+                    }
+                }   
             });
     }
 
@@ -134,6 +140,7 @@ class Chat extends React.Component{
         let messageText = document.getElementById('messageText');
         let destination = this.props.otherUser;
         if(destination != ''){
+            this.state.socket.send(JSON.stringify({sender: loginSplit[1], destination: destination, operation: "Send message", message: messageText.value}));
             postData('/sendMessage', {messageText: messageText.value, destination: destination})
             .then(data => {
                     if(data.response == 'ok'){

@@ -8,9 +8,6 @@ module.exports = function(app, db){
             res.render('index');
     });
 
-    app.get('/', (req, res) => {
-        res.render('main');
-    });
 
     app.post('/signUp', bodyParser.jsonParser,(req, res) =>{
         let user = {login: req.body.login, password: req.body.password};

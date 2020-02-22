@@ -20,6 +20,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var loginSplit = document.cookie.split(';');
 loginSplit = loginSplit[0].split('=');
+var tmpMessageList = [];
 
 var Headder =
 /*#__PURE__*/
@@ -77,7 +78,8 @@ function (_React$Component2) {
     _this2 = _possibleConstructorReturn(this, _getPrototypeOf(UsersLsit).call(this, props));
     _this2.state = {
       list: "",
-      activeUser: ""
+      activeUser: "",
+      socket: new WebSocket('ws://localhost:3001')
     };
     return _this2;
   }
@@ -125,7 +127,8 @@ function (_React$Component2) {
       }, React.createElement("div", {
         className: "usersList"
       }, this.state.list), React.createElement(Chat, {
-        otherUser: this.state.activeUser
+        otherUser: this.state.activeUser,
+        socket: this.state.socket
       }));
     }
   }]);
@@ -148,7 +151,9 @@ function (_React$Component3) {
       messages: React.createElement("div", {
         className: "messageCover"
       }, "The history of messages will be displayed here."),
-      destination: ""
+      destination: "",
+      socket: props.socket,
+      test: 0
     };
     _this4.sendMessage = _this4.sendMessage.bind(_assertThisInitialized(_this4));
     return _this4;
@@ -159,14 +164,33 @@ function (_React$Component3) {
     value: function componentDidMount() {
       var _this5 = this;
 
-      this.updateInterval = setInterval(function () {
-        _this5.getMessages();
-      }, 1000);
-    }
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      clearInterval(this.updateInterval);
+      this.state.socket.onopen = function () {
+        _this5.state.socket.send(JSON.stringify({
+          login: loginSplit[1],
+          operation: "User connect"
+        }));
+
+        _this5.state.socket.onmessage = function (message) {
+          var data = JSON.parse(message.data);
+
+          if (data.operation == "Send message" && _this5.props.otherUser == data.sender) {
+            //Если пользователь на странице диалога с отправителем сообщения
+            var newMessage = React.createElement("div", {
+              className: "message",
+              key: Math.random()
+            }, React.createElement("div", {
+              className: "messageUsername"
+            }, data.sender), React.createElement("div", {
+              className: "messageText"
+            }, data.message));
+            tmpMessageList.push(newMessage);
+
+            _this5.setState({
+              messages: tmpMessageList
+            });
+          }
+        };
+      };
     }
   }, {
     key: "componentDidUpdate",
@@ -181,44 +205,31 @@ function (_React$Component3) {
       var _this6 = this;
 
       var destination = this.props.otherUser;
+      tmpMessageList = [];
       document.cookie = "destination=".concat(destination);
-      var messagesList = [];
       var messages = getData('/messages').then(function (data) {
-        console.log(data);
+        if (data.response == "Empty") {
+          _this6.setState({
+            messages: React.createElement("div", {
+              className: "messageCover"
+            }, "The history of messages will be displayed here.")
+          });
+        } else {
+          for (var key in data) {
+            tmpMessageList.push(React.createElement("div", {
+              key: data[key]._id,
+              className: "message"
+            }, React.createElement("div", {
+              className: "messageUsername"
+            }, data[key].sender), React.createElement("div", {
+              className: "messageText"
+            }, data[key].message)));
 
-        for (var key in data) {
-          var classNameMessage = '';
-
-          if (data[key].wasRead == false && data[key].sender == loginSplit[1]) {
-            classNameMessage = 'message unread';
-          } else if (data[key].wasRead == false && data[key].sender != loginSplit[1]) {
-            postData('/wasRead', {
-              id: data[key]._id,
-              sender: data[key].sender
-            }).then(function (data) {
-              console.log(data.response);
-
-              if (data.response == 'ok') {
-                _this6.getMessages();
-              }
+            _this6.setState({
+              messages: tmpMessageList
             });
-          } else {
-            classNameMessage = 'message';
           }
-
-          messagesList.push(React.createElement("div", {
-            key: data[key]._id,
-            className: classNameMessage
-          }, React.createElement("div", {
-            className: "messageUsername"
-          }, data[key].sender), React.createElement("div", {
-            className: "messageText"
-          }, data[key].message)));
         }
-
-        _this6.setState({
-          messages: messagesList
-        });
       });
     }
   }, {
@@ -230,6 +241,12 @@ function (_React$Component3) {
       var destination = this.props.otherUser;
 
       if (destination != '') {
+        this.state.socket.send(JSON.stringify({
+          sender: loginSplit[1],
+          destination: destination,
+          operation: "Send message",
+          message: messageText.value
+        }));
         postData('/sendMessage', {
           messageText: messageText.value,
           destination: destination
