@@ -24,9 +24,24 @@ module.exports = function(app, db, ObjectId, webSocket){
                 connectedUsers.push({login: message.login, ws: ws});
             }
             else if(message.operation == "Send message"){
+                const collection = db.db('MeChat').collection('messages');
+                let wsMessage = {operation: message.operation,sender: message.sender, message: message.messageText, id: message.id, wasRead : true}
                 for(let key in connectedUsers){
                     if(connectedUsers[key].login == message.destination){
-                        connectedUsers[key].ws.send(JSON.stringify(message));
+                        connectedUsers[key].ws.send(JSON.stringify(wsMessage));
+                    } 
+                }
+            }
+            else if(message.operation == "Was read"){
+                let sendObj ={reader: message.reader, id: message.id, operation: message.operation,sender: message.sender, wasRead: false}
+                for(let key in connectedUsers){
+                    if(connectedUsers[key].login == message.sender && message.wasRead == false){
+                        console.log("ok");
+                        connectedUsers[key].ws.send(JSON.stringify(sendObj));
+                    }
+                    else if(connectedUsers[key].login == message.sender && message.wasRead == true){
+                        sendObj.wasRead = true;
+                        connectedUsers[key].ws.send(JSON.stringify(sendObj));
                     }
                 }
             }
@@ -63,7 +78,7 @@ module.exports = function(app, db, ObjectId, webSocket){
         let sendMessage = collection.insert(insertMessage, (err, result) =>{
             if(err) res.send({response: "Error"})
             else{
-                res.send({response: "ok"});
+                res.send({response: "ok", id: result.insertedIds[0]});
             } 
         });
     });

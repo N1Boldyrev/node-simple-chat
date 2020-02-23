@@ -81,9 +81,8 @@ class Chat extends React.Component{
             messages: <div className = "messageCover">The history of messages will be displayed here.</div>,
             destination:"",
             socket: props.socket,
-            test: 0
+            readable : [1, 2 , 3]
         };
-
         this.sendMessage = this.sendMessage.bind(this);
     }
 
@@ -93,14 +92,34 @@ class Chat extends React.Component{
             this.state.socket.onmessage = message => {
                let data = JSON.parse(message.data);
                if(data.operation == "Send message" && this.props.otherUser == data.sender){ //Если пользователь на странице диалога с отправителем сообщения
-                    let newMessage = <div className = "message" key = {Math.random()}>
+                    let newMessage = <div className = "message" key = {data.id} id = {data.id}>
                         <div className= "messageUsername">{data.sender}</div>
                         <div className="messageText">{data.message}</div>
-                    </div>;
+               </div>;
                     tmpMessageList.push(newMessage);
+                    
+                    this.state.socket.send(JSON.stringify({
+                        sender: loginSplit[1], reader: data.sender, id: data.id , operation: "Was read", wasRead: false
+                    }));
+
                     this.setState({
                         messages: tmpMessageList
                     });
+                    
+               }
+               else if(data.operation == "Was read"){
+                   console.log("ok");
+                   if(data.reader == this.props.otherUser){
+                       document.getElementById(data.id).className = "message";
+                       if(data.wasRead == false){
+                       this.state.socket.send(JSON.stringify({
+                        sender: data.reader, reader: data.sender, id: data.id , operation: "Was read", wasRead: true
+                    }));
+                }
+                    else if(data.wasRead == true){
+                        console.log("okok");
+                    }
+                   }
                }
             };
         }
@@ -116,6 +135,7 @@ class Chat extends React.Component{
             let destination = this.props.otherUser;
             tmpMessageList = [];
             document.cookie = `destination=${destination}`;
+            let wasRead = '';
             let messages = getData('/messages')
             .then(data =>{
                 if(data.response == "Empty"){
@@ -123,14 +143,26 @@ class Chat extends React.Component{
                 }
                 else{
                     for(let key in data){
-                        tmpMessageList.push(<div key = {data[key]._id} className = "message">
+                        if(data[key].wasRead == false){
+                            wasRead = 'message unread';
+                            if(data[key].sender != loginSplit[1]){
+                                postData('/wasRead', {id: data[key]._id});
+                                this.state.socket.send(JSON.stringify({
+                                    sender: data[key].sender, reader: loginSplit[1],id: data[key]._id, operation: "Was read", wasRead: false
+                                }));
+                            }
+                        }
+                        else
+                            wasRead = 'message';
+
+                        tmpMessageList.push(<div key = {data[key]._id} id = {data[key]._id} className = {wasRead}>
                         <div className= "messageUsername">{data[key].sender}</div>
                         <div className="messageText">{data[key].message}</div>
                     </div>);
+                    }
                     this.setState({
                         messages: tmpMessageList,
                     });
-                    }
                 }   
             });
     }
@@ -139,17 +171,27 @@ class Chat extends React.Component{
     sendMessage(){
         let messageText = document.getElementById('messageText');
         let destination = this.props.otherUser;
-        if(destination != ''){
-            this.state.socket.send(JSON.stringify({sender: loginSplit[1], destination: destination, operation: "Send message", message: messageText.value}));
-            postData('/sendMessage', {messageText: messageText.value, destination: destination})
-            .then(data => {
-                    if(data.response == 'ok'){
-                        messageText.value = '';
-                        this.getMessages();
-                    }
-            });
+        let id = "";
+        let sendObj = {
+            users:[loginSplit[1], destination], 
+            destination: destination, 
+            sender: loginSplit[1], 
+            messageText: messageText.value
         }
-    }
+        postData('/sendMessage',sendObj).then(data =>{
+            id = data.id;
+            tmpMessageList.push(<div key = {id} id = {id} className = "message unread">
+            <div className= "messageUsername">{loginSplit[1]}</div>
+            <div className="messageText">{messageText.value}</div>
+        </div>);
+
+            sendObj.operation = "Send message";
+            sendObj.id = id;
+            this.state.socket.send(JSON.stringify(sendObj));
+
+        this.setState({messages: tmpMessageList});   
+        })
+        }
 
     render() {
         return (

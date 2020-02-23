@@ -153,7 +153,7 @@ function (_React$Component3) {
       }, "The history of messages will be displayed here."),
       destination: "",
       socket: props.socket,
-      test: 0
+      readable: [1, 2, 3]
     };
     _this4.sendMessage = _this4.sendMessage.bind(_assertThisInitialized(_this4));
     return _this4;
@@ -177,7 +177,8 @@ function (_React$Component3) {
             //Если пользователь на странице диалога с отправителем сообщения
             var newMessage = React.createElement("div", {
               className: "message",
-              key: Math.random()
+              key: data.id,
+              id: data.id
             }, React.createElement("div", {
               className: "messageUsername"
             }, data.sender), React.createElement("div", {
@@ -185,9 +186,35 @@ function (_React$Component3) {
             }, data.message));
             tmpMessageList.push(newMessage);
 
+            _this5.state.socket.send(JSON.stringify({
+              sender: loginSplit[1],
+              reader: data.sender,
+              id: data.id,
+              operation: "Was read",
+              wasRead: false
+            }));
+
             _this5.setState({
               messages: tmpMessageList
             });
+          } else if (data.operation == "Was read") {
+            console.log("ok");
+
+            if (data.reader == _this5.props.otherUser) {
+              document.getElementById(data.id).className = "message";
+
+              if (data.wasRead == false) {
+                _this5.state.socket.send(JSON.stringify({
+                  sender: data.reader,
+                  reader: data.sender,
+                  id: data.id,
+                  operation: "Was read",
+                  wasRead: true
+                }));
+              } else if (data.wasRead == true) {
+                console.log("okok");
+              }
+            }
           }
         };
       };
@@ -207,6 +234,7 @@ function (_React$Component3) {
       var destination = this.props.otherUser;
       tmpMessageList = [];
       document.cookie = "destination=".concat(destination);
+      var wasRead = '';
       var messages = getData('/messages').then(function (data) {
         if (data.response == "Empty") {
           _this6.setState({
@@ -216,19 +244,38 @@ function (_React$Component3) {
           });
         } else {
           for (var key in data) {
+            if (data[key].wasRead == false) {
+              wasRead = 'message unread';
+
+              if (data[key].sender != loginSplit[1]) {
+                postData('/wasRead', {
+                  id: data[key]._id
+                });
+
+                _this6.state.socket.send(JSON.stringify({
+                  sender: data[key].sender,
+                  reader: loginSplit[1],
+                  id: data[key]._id,
+                  operation: "Was read",
+                  wasRead: false
+                }));
+              }
+            } else wasRead = 'message';
+
             tmpMessageList.push(React.createElement("div", {
               key: data[key]._id,
-              className: "message"
+              id: data[key]._id,
+              className: wasRead
             }, React.createElement("div", {
               className: "messageUsername"
             }, data[key].sender), React.createElement("div", {
               className: "messageText"
             }, data[key].message)));
-
-            _this6.setState({
-              messages: tmpMessageList
-            });
           }
+
+          _this6.setState({
+            messages: tmpMessageList
+          });
         }
       });
     }
@@ -239,25 +286,33 @@ function (_React$Component3) {
 
       var messageText = document.getElementById('messageText');
       var destination = this.props.otherUser;
+      var id = "";
+      var sendObj = {
+        users: [loginSplit[1], destination],
+        destination: destination,
+        sender: loginSplit[1],
+        messageText: messageText.value
+      };
+      postData('/sendMessage', sendObj).then(function (data) {
+        id = data.id;
+        tmpMessageList.push(React.createElement("div", {
+          key: id,
+          id: id,
+          className: "message unread"
+        }, React.createElement("div", {
+          className: "messageUsername"
+        }, loginSplit[1]), React.createElement("div", {
+          className: "messageText"
+        }, messageText.value)));
+        sendObj.operation = "Send message";
+        sendObj.id = id;
 
-      if (destination != '') {
-        this.state.socket.send(JSON.stringify({
-          sender: loginSplit[1],
-          destination: destination,
-          operation: "Send message",
-          message: messageText.value
-        }));
-        postData('/sendMessage', {
-          messageText: messageText.value,
-          destination: destination
-        }).then(function (data) {
-          if (data.response == 'ok') {
-            messageText.value = '';
+        _this7.state.socket.send(JSON.stringify(sendObj));
 
-            _this7.getMessages();
-          }
+        _this7.setState({
+          messages: tmpMessageList
         });
-      }
+      });
     }
   }, {
     key: "render",
