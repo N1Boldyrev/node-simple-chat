@@ -36,7 +36,6 @@ module.exports = function(app, db, ObjectId, webSocket){
                 let sendObj ={reader: message.reader, id: message.id, operation: message.operation,sender: message.sender, wasRead: false}
                 for(let key in connectedUsers){
                     if(connectedUsers[key].login == message.sender && message.wasRead == false){
-                        console.log("ok");
                         connectedUsers[key].ws.send(JSON.stringify(sendObj));
                     }
                     else if(connectedUsers[key].login == message.sender && message.wasRead == true){
@@ -67,6 +66,23 @@ module.exports = function(app, db, ObjectId, webSocket){
         }
             });
     });
+
+
+    app.post('/findMessages', bodyParser.jsonParser, (req, res) => {
+        let user = req.body.login;
+        let findMessages = {users: user, wasRead: false};
+        let collection = db.db('MeChat').collection('messages');
+        let messages = collection.find(findMessages);
+        messages.toArray((err, results) =>{
+            if(err){
+                res.send({response:"Error"});
+            }
+            else if(results.length == 0){
+                res.send({response: "Empty"});
+            }
+            else res.send(results);
+        });
+    })
 
     app.post('/sendMessage', bodyParser.jsonParser, (req, res) => {
         let sender = req.cookies.login;

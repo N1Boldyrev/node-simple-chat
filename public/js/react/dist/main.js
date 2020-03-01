@@ -90,6 +90,7 @@ function (_React$Component2) {
       var _this3 = this;
 
       var userList = [];
+      var usersLogin = [];
       var users = getData('/UsersList').then(function (data) {
         for (var key in data) {
           if (loginSplit[1] != data[key].login) {
@@ -99,11 +100,29 @@ function (_React$Component2) {
               onClick: _this3.userChange.bind(_this3, data[key].login),
               className: "user"
             }, data[key].login));
+            usersLogin.push(data[key].login);
           }
         }
 
         _this3.setState({
           list: userList
+        }); //Проверка на присутствие непрочитанных сообщений у пользователя
+
+
+        var unread = postData('/findMessages', {
+          login: loginSplit[1]
+        }).then(function (data) {
+          for (var _key in data) {
+            if (data[_key].sender != loginSplit[1]) {
+              var _sender = void 0;
+
+              if (data[_key].users[0] == loginSplit[1]) {
+                _sender = data[_key].users[1];
+              } else _sender = data[_key].users[0];
+            }
+
+            document.getElementById(sender).className = "user unread";
+          }
         });
       });
     }
@@ -197,6 +216,8 @@ function (_React$Component3) {
             _this5.setState({
               messages: tmpMessageList
             });
+          } else if (data.operation == "Send message" && _this5.props.otherUser != data.sender) {
+            document.getElementById(data.sender).className = "user unread";
           } else if (data.operation == "Was read") {
             console.log("ok");
 
@@ -312,6 +333,8 @@ function (_React$Component3) {
         _this7.setState({
           messages: tmpMessageList
         });
+
+        messageText.value = '';
       });
     }
   }, {

@@ -40,6 +40,7 @@ class UsersLsit extends React.Component{
 
     componentDidMount(){
         let userList = [];
+        let usersLogin =[];
         let users = getData('/UsersList')
         .then(data => {
             for(let key in data){
@@ -47,9 +48,25 @@ class UsersLsit extends React.Component{
                 userList.push(<div key = {data[key]._id} id = {data[key].login} onClick = {this.userChange.bind(this, data[key].login)} className = "user">
                     {data[key].login}
                     </div>);
+                usersLogin.push(data[key].login);
                 }
             }
             this.setState({list: userList});
+
+            //Проверка на присутствие непрочитанных сообщений у пользователя
+            let unread = postData('/findMessages', {login: loginSplit[1]})
+            .then(data => {
+                for(let key in data){
+                    if(data[key].sender != loginSplit[1]){
+                        let sender;
+                        if(data[key].users[0] == loginSplit[1]){
+                            sender = data[key].users[1];
+                        }
+                        else sender = data[key].users[0];
+                    }
+                    document.getElementById(sender).className = "user unread";
+                }
+            })
         });
     }
 
@@ -107,6 +124,11 @@ class Chat extends React.Component{
                     });
                     
                }
+
+               else if(data.operation == "Send message" && this.props.otherUser != data.sender){
+                   document.getElementById(data.sender).className = "user unread";
+               }
+
                else if(data.operation == "Was read"){
                    console.log("ok");
                    if(data.reader == this.props.otherUser){
@@ -189,7 +211,8 @@ class Chat extends React.Component{
             sendObj.id = id;
             this.state.socket.send(JSON.stringify(sendObj));
 
-        this.setState({messages: tmpMessageList});   
+        this.setState({messages: tmpMessageList});
+        messageText.value = '';
         })
         }
 
