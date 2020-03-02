@@ -101,9 +101,14 @@ class Chat extends React.Component{
             readable : [1, 2 , 3]
         };
         this.sendMessage = this.sendMessage.bind(this);
+        this.keyboardInput = this.keyboardInput.bind(this);
     }
 
     componentDidMount(){
+        const messageTextArea = document.getElementById("messageInput");
+        messageTextArea.addEventListener("keydown", this.keyboardInput);
+
+
         this.state.socket.onopen = () =>{
             this.state.socket.send(JSON.stringify({login: loginSplit[1], operation: "User connect"}));
             this.state.socket.onmessage = message => {
@@ -191,7 +196,7 @@ class Chat extends React.Component{
 
 
     sendMessage(){
-        let messageText = document.getElementById('messageText');
+        let messageText = document.getElementById('messageInput');
         let destination = this.props.otherUser;
         let id = "";
         let sendObj = {
@@ -216,12 +221,20 @@ class Chat extends React.Component{
         })
         }
 
+        keyboardInput(event){
+            if(event.key == 'Enter' && this.props.otherUser != "" && document.getElementById("messageInput").value != '')
+                this.sendMessage();
+            else if(this.props.otherUser == "" && event.key == 'Enter'){
+                document.getElementById('messageInput').value = '';
+            }
+        }
+
     render() {
         return (
              <div className="chat">
                  <div className="messages">{this.state.messages}</div>
                  <div className="messageSender">
-                <textarea name="" id="messageText" cols="60" rows="2" className="messageText"></textarea>
+                <textarea name="" id="messageInput" cols="60" rows="2" className="messageInput" placeholder = "Write a message..."></textarea>
                 <button className="sendButton" onClick = {this.sendMessage}>></button>
                  </div>
              </div>
@@ -237,4 +250,6 @@ ReactDOM.render(
     </div>,
     document.getElementById("root")
 );
+
+
 

@@ -1,3 +1,5 @@
+@media only screen and (max-width: 1920px) and (min-width: 1000px){
+
 body{
     font-family: 'Roboto', sans-serif;
     padding: 0;
@@ -25,12 +27,14 @@ body{
     border-radius: 0 0 40px 40px;
     border: 1px solid #BEBEBE;
     border-top: none;
-    height: 10%;
+    height: 9%;
+    width: 100%;
 }
 
 .logo{
     padding-left: 60px;
     font-size: 40px;
+    padding-top: 8px;
     font-family: 'Lobster', cursive;
     color: #A762E5;
     transition: linear 0.3s;
@@ -42,9 +46,10 @@ body{
 }
 
 .username{
-    margin-left: 1000px;
-    padding-top: 15px;
+    padding-right: 30px;
+    padding-top: 20px;
     font-size: 20px;
+
 }
 
 .username:hover{
@@ -53,7 +58,7 @@ body{
 
 .signOut{
     padding-right: 30px;
-    padding-top: 8px;
+    padding-top: 15px;
 }
 
 .signOut button{
@@ -77,9 +82,9 @@ body{
     flex-direction: row;
     justify-content: space-around;
     background-color: white;
-    width: 50%;
-    max-height: 90%;
-    min-height: 90%;
+    width: 65%;
+    max-height: 91%;
+    min-height: 91%;
 }
 
 .usersList{
@@ -112,22 +117,23 @@ body{
 
 .chat{
     position: relative;
-    width: 100%;
+    width: 80%;
     height: 100%;
 }
 
 .messages{
+    border: none;
     border-bottom: 1px solid #BEBEBE;
     min-width: 100%;
     max-width: 100%;
     height: 90%;
     word-wrap: break-word;
+    overflow: auto;
 }
 
 .messageCover{
-    height: 100%;
-    padding-top: 50%;
-    padding-left: 20%;
+    padding-top: 45%;
+    padding-left: 23%;
     color: #717171;
 }
 
@@ -135,18 +141,27 @@ body{
     position: relative;
     display: flex;
     bottom: 0px;
-    padding-left: 60px;
+    padding-left: 20%;
+    padding-right: 15%;
     margin-top: 20px;
     flex-direction: row;
 }
 
-.messageText{
-    resize: none;
-}
 
 .sendButton{
     height: 40px;
     width: 40px;
+    margin-left: 5px;
+    background-color: #3AB4A8;
+    border-radius: 3px;
+    border: none;
+    color: white;
+    transition: linear 0.3s;
+}
+
+.sendButton:hover{
+    background-color: #A762E5;
+    cursor: pointer;
 }
 
 
@@ -160,10 +175,19 @@ body{
     color: #B34DEE;
 }
 
-.messageText{
+.messageInput{
     padding-top: 5px;
+    border: 2px solid #3AB4A8;
+    border-radius: 10px;
+    outline: none;
+    -moz-appearance: none;
+    overflow: auto;
+    padding-left: 10px;
+    resize: none;
 }
 
 .unread{
     background: #E5D5EE;
+}
+
 }

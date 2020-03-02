@@ -175,6 +175,7 @@ function (_React$Component3) {
       readable: [1, 2, 3]
     };
     _this4.sendMessage = _this4.sendMessage.bind(_assertThisInitialized(_this4));
+    _this4.keyboardInput = _this4.keyboardInput.bind(_assertThisInitialized(_this4));
     return _this4;
   }
 
@@ -182,6 +183,9 @@ function (_React$Component3) {
     key: "componentDidMount",
     value: function componentDidMount() {
       var _this5 = this;
+
+      var messageTextArea = document.getElementById("messageInput");
+      messageTextArea.addEventListener("keydown", this.keyboardInput);
 
       this.state.socket.onopen = function () {
         _this5.state.socket.send(JSON.stringify({
@@ -305,7 +309,7 @@ function (_React$Component3) {
     value: function sendMessage() {
       var _this7 = this;
 
-      var messageText = document.getElementById('messageText');
+      var messageText = document.getElementById('messageInput');
       var destination = this.props.otherUser;
       var id = "";
       var sendObj = {
@@ -338,6 +342,13 @@ function (_React$Component3) {
       });
     }
   }, {
+    key: "keyboardInput",
+    value: function keyboardInput(event) {
+      if (event.key == 'Enter' && this.props.otherUser != "" && document.getElementById("messageInput").value != '') this.sendMessage();else if (this.props.otherUser == "" && event.key == 'Enter') {
+        document.getElementById('messageInput').value = '';
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
       return React.createElement("div", {
@@ -348,10 +359,11 @@ function (_React$Component3) {
         className: "messageSender"
       }, React.createElement("textarea", {
         name: "",
-        id: "messageText",
+        id: "messageInput",
         cols: "60",
         rows: "2",
-        className: "messageText"
+        className: "messageInput",
+        placeholder: "Write a message..."
       }), React.createElement("button", {
         className: "sendButton",
         onClick: this.sendMessage
