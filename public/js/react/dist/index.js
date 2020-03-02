@@ -31,7 +31,8 @@ function (_React$Component) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(LoginScreen).call(this, props));
     _this.state = {
       button_id: "signIn",
-      logo_id: "logo"
+      logo_id: "logo",
+      form_id: "loginForm"
     };
     _this.mouseOver = _this.mouseOver.bind(_assertThisInitialized(_this));
     _this.mouseOut = _this.mouseOut.bind(_assertThisInitialized(_this));
@@ -45,7 +46,8 @@ function (_React$Component) {
     value: function mouseOver() {
       this.setState({
         button_id: 'button_hover',
-        logo_id: 'logo_hover'
+        logo_id: 'logo_hover',
+        form_id: "loginForm_hover"
       });
     }
   }, {
@@ -53,7 +55,8 @@ function (_React$Component) {
     value: function mouseOut() {
       this.setState({
         button_id: 'signIn',
-        logo_id: 'logo'
+        logo_id: 'logo',
+        form_id: "loginForm"
       });
     }
   }, {
@@ -143,7 +146,7 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       return React.createElement("div", {
-        id: "loginForm"
+        id: this.state.form_id
       }, React.createElement("div", {
         className: this.state.logo_id
       }, "MeChat"), React.createElement("div", {

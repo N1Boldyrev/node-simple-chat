@@ -1,8 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Lobster|Roboto&display=swap');
 
 body{
-background: rgb(58,180,168);
-background: linear-gradient(90deg, rgba(58,180,168,1) 0%, rgba(207,69,252,1) 100%);
+background: black;
 font-family: 'Roboto', sans-serif;
 display: flex;
 flex-direction: row;
@@ -12,9 +11,28 @@ align-items: center;
 
 #loginForm{
     background: white;
-    padding: 150px 100px;
+    padding: 100px 100px;
     border-radius: 5%;
     text-align: center;
+
+
+    -webkit-box-shadow: 0px 0px 78px -4px rgba(167,98,229);
+    -moz-box-shadow: 0px 0px 78px -4px rgba(167,98,229);
+    box-shadow: 0px 0px 78px -4px rgba(167,98,229);
+    transition: linear 0.3s;
+}
+
+#loginForm_hover{
+    background: white;
+    padding: 100px 100px;
+    border-radius: 5%;
+    text-align: center;
+
+
+    -webkit-box-shadow: 0px 0px 78px 3px rgba(60,179,169);
+    -moz-box-shadow: 0px 0px 78px 3px rgba(60,179,169);
+    box-shadow: 0px 0px 78px 3px rgba(60,179,169);
+    transition: linear 0.3s;
 }
 
 #login_text{

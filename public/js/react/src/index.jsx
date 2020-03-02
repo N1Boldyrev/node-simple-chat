@@ -3,7 +3,8 @@ class LoginScreen extends React.Component{
         super(props);
         this.state = {
             button_id : "signIn",
-            logo_id: "logo"
+            logo_id: "logo",
+            form_id: "loginForm"
         };
 
         this.mouseOver = this.mouseOver.bind(this);
@@ -16,14 +17,16 @@ class LoginScreen extends React.Component{
     mouseOver(){
         this.setState({
             button_id : 'button_hover',
-            logo_id: 'logo_hover'
+            logo_id: 'logo_hover',
+            form_id: "loginForm_hover"
         });
     };
 
     mouseOut(){
         this.setState({
             button_id: 'signIn',
-            logo_id: 'logo'
+            logo_id: 'logo',
+            form_id: "loginForm"
         });
     };
 
@@ -111,7 +114,7 @@ class LoginScreen extends React.Component{
 
     render() {
         return (
-             <div id="loginForm">
+             <div id={this.state.form_id}>
                  <div className={this.state.logo_id}>MeChat</div>
                  <div id="login_text">Login</div>
                  <input type="text" name="" id="login" autoComplete = 'off' className = 'login' onChange = {this.inputValChanged.bind(this,'login','login')}/>
