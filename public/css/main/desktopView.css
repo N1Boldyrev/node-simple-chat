@@ -18,7 +18,7 @@ body{
     align-items: center;
     
 }
-.headder{
+#headder{
     display: flex;
     justify-content: space-around;
     background: white;
@@ -34,9 +34,30 @@ body{
     -webkit-box-shadow: 0px 0px 78px -4px rgba(167,98,229);
     -moz-box-shadow: 0px 0px 78px -4px rgba(167,98,229);
     box-shadow: 0px 0px 78px -4px rgba(167,98,229);
+    transition: linear 0.3s;
 }
 
-.logo{
+
+#headder_hover{
+    display: flex;
+    justify-content: space-around;
+    background: white;
+    margin: 0 12%;
+    border-radius: 0 0 40px 40px;
+    border: 1px solid #BEBEBE;
+    border-top: none;
+    height: 9%;
+    width: 100%;
+
+    z-index: 2;
+    
+    -webkit-box-shadow: 0px 0px 78px -4px rgba(60,179,169);
+    -moz-box-shadow: 0px 0px 78px -4px rgba(60,179,169);
+    box-shadow: 0px 0px 78px -4px rgba(60,179,169);
+    transition: linear 0.3s;
+}
+
+#logo{
     padding-left: 60px;
     font-size: 40px;
     padding-top: 8px;
@@ -45,9 +66,14 @@ body{
     transition: linear 0.3s;
 }
 
-.logo:hover{
+#logo_hover{
     color: #3AB4A8 ;
     cursor: pointer;
+    padding-left: 60px;
+    font-size: 40px;
+    padding-top: 8px;
+    font-family: 'Lobster', cursive;
+    transition: linear 0.3s;
 }
 
 .username{
@@ -61,12 +87,8 @@ body{
     cursor: default;
 }
 
-.signOut{
-    padding-right: 30px;
-    padding-top: 15px;
-}
-
-.signOut button{
+#signOut button{
+    margin-top: 15px;
     font-size: 20px;
     padding: 6px;
     background-color: #A762E5;
@@ -76,7 +98,14 @@ body{
     transition: linear 0.3s;
 }
 
-.signOut button:hover{
+#signOut_hover button{
+    margin-top: 15px;
+    font-size: 20px;
+    padding: 6px;
+    border-radius: 3px;
+    border: none;
+    color: white;
+    transition: linear 0.3s;
     background-color: #3AB4A8;
     cursor: pointer;
 }
@@ -144,7 +173,7 @@ body{
 
 .messageCover{
     padding-top: 45%;
-    padding-left: 23%;
+    text-align: center;
     color: #717171;
 }
 
@@ -195,6 +224,21 @@ body{
     overflow: auto;
     padding-left: 10px;
     resize: none;
+    font-family: 'Roboto', sans-serif;
+    transition: linear 0.3s;
+}
+
+.messageInput_hover{
+    padding-top: 5px;
+    border: 2px solid #3AB4A8;
+    border-radius: 10px;
+    outline: none;
+    -moz-appearance: none;
+    overflow: auto;
+    padding-left: 10px;
+    resize: none;
+    font-family: 'Roboto', sans-serif;
+    transition: linear 0.3s;
 }
 
 .unread{

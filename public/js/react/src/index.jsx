@@ -4,7 +4,9 @@ class LoginScreen extends React.Component{
         this.state = {
             button_id : "signIn",
             logo_id: "logo",
-            form_id: "loginForm"
+            form_id: "loginForm",
+            socket: new WebSocket('ws://localhost:3001'),
+            socketOpen: false
         };
 
         this.mouseOver = this.mouseOver.bind(this);
@@ -13,6 +15,12 @@ class LoginScreen extends React.Component{
         this.signIn = this.signIn.bind(this);
     }
 
+
+    componentDidMount(){
+        this.state.socket.onopen = () =>{
+            this.setState({socketOpen: true});
+        }
+    }
 
     mouseOver(){
         this.setState({
@@ -79,6 +87,10 @@ class LoginScreen extends React.Component{
                 login.value = '';
                 password.value = '';
                 message.hidden = false;
+
+                if(this.state.socketOpen == true){
+                    this.state.socket.send(JSON.stringify({operation: "New user"}));
+                }
             })
             .catch(error => console.log(error));
         }

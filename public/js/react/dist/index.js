@@ -32,7 +32,9 @@ function (_React$Component) {
     _this.state = {
       button_id: "signIn",
       logo_id: "logo",
-      form_id: "loginForm"
+      form_id: "loginForm",
+      socket: new WebSocket('ws://localhost:3001'),
+      socketOpen: false
     };
     _this.mouseOver = _this.mouseOver.bind(_assertThisInitialized(_this));
     _this.mouseOut = _this.mouseOut.bind(_assertThisInitialized(_this));
@@ -42,6 +44,17 @@ function (_React$Component) {
   }
 
   _createClass(LoginScreen, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      this.state.socket.onopen = function () {
+        _this2.setState({
+          socketOpen: true
+        });
+      };
+    }
+  }, {
     key: "mouseOver",
     value: function mouseOver() {
       this.setState({
@@ -86,6 +99,8 @@ function (_React$Component) {
   }, {
     key: "signUp",
     value: function signUp() {
+      var _this3 = this;
+
       var login = document.getElementById('login');
       var password = document.getElementById('password');
       var message = document.getElementById('message');
@@ -108,6 +123,12 @@ function (_React$Component) {
           login.value = '';
           password.value = '';
           message.hidden = false;
+
+          if (_this3.state.socketOpen == true) {
+            _this3.state.socket.send(JSON.stringify({
+              operation: "New user"
+            }));
+          }
         })["catch"](function (error) {
           return console.log(error);
         });

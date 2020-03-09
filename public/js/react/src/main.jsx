@@ -10,19 +10,35 @@ class Headder extends React.Component{
         };
 
         this.signOut = this.signOut.bind(this);
+        this.mouseOverHeadder = this.mouseOverHeadder.bind(this);
+        this.mouseOutHeadder = this.mouseOutHeadder.bind(this);
     };
 
     signOut(){
         document.cookie = "login=";
         document.location.href = "/";
     }
+
+    mouseOverHeadder(){
+        document.getElementsByClassName('headder')[0].id = "headder_hover";
+        document.getElementsByClassName('logo')[0].id = "logo_hover";
+        document.getElementsByClassName('signOut')[0].id = "signOut_hover";
+    }
+
+    mouseOutHeadder(){
+        document.getElementsByClassName('headder')[0].id = "headder";
+        document.getElementsByClassName('logo')[0].id = "logo";
+        document.getElementsByClassName('signOut')[0].id = "signOut";
+    }
         
         render() {
             return (
-                 <div className="headder">
-                     <div className="logo">MeChat</div>
+                 <div className="headder" id = "headder">
+                     <div className="logo" id = "logo" onMouseOver = {this.mouseOverHeadder} onMouseOut = {this.mouseOutHeadder}>MeChat</div>
                      <div className="username">{loginSplit[1]}</div>
-                     <div className="signOut" onClick = {this.signOut}><button>Sign out</button></div>
+                     <div className="signOut" onClick = {this.signOut} id="signOut" onMouseOver = {this.mouseOverHeadder} onMouseOut = {this.mouseOutHeadder}>
+                         <button>Sign out</button>
+                         </div>
                  </div>
             );
         }
@@ -36,6 +52,8 @@ class UsersLsit extends React.Component{
             activeUser: "",
             socket: new WebSocket('ws://localhost:3001')
         };
+
+        this.getUsersList = this.getUsersList.bind(this);
     }
 
     componentDidMount(){
@@ -70,6 +88,23 @@ class UsersLsit extends React.Component{
         });
     }
 
+    getUsersList(){
+        let userList = [];
+        let usersLogin =[];
+        let users = getData('/UsersList')
+        .then(data => {
+            for(let key in data){
+                if(loginSplit[1] != data[key].login){
+                userList.push(<div key = {data[key]._id} id = {data[key].login} onClick = {this.userChange.bind(this, data[key].login)} className = "user">
+                    {data[key].login}
+                    </div>);
+                usersLogin.push(data[key].login);
+                }
+            }
+            this.setState({list: userList});
+    })
+}
+
     userChange(id){
         if(this.state.activeUser != ""){
             document.getElementById(this.state.activeUser).className = "User";
@@ -84,7 +119,7 @@ class UsersLsit extends React.Component{
                  <div className="usersList">   
                    {this.state.list}
                 </div>
-                 <Chat otherUser = {this.state.activeUser}  socket = {this.state.socket}/>
+                 <Chat otherUser = {this.state.activeUser}  socket = {this.state.socket} getUsersList = {this.getUsersList}/>
             </div>
         );
     }
@@ -102,6 +137,8 @@ class Chat extends React.Component{
         };
         this.sendMessage = this.sendMessage.bind(this);
         this.keyboardInput = this.keyboardInput.bind(this);
+        this.mouseOverSendButton = this.mouseOverSendButton.bind(this);
+        this.mouseOutSendButton = this.mouseOutSendButton.bind(this);
     }
 
     componentDidMount(){
@@ -134,8 +171,11 @@ class Chat extends React.Component{
                    document.getElementById(data.sender).className = "user unread";
                }
 
+               else if(data.operation == "New user"){
+                   this.props.getUsersList();
+               }
+
                else if(data.operation == "Was read"){
-                   console.log("ok");
                    if(data.reader == this.props.otherUser){
                        document.getElementById(data.id).className = "message";
                        if(data.wasRead == false){
@@ -144,7 +184,6 @@ class Chat extends React.Component{
                     }));
                 }
                     else if(data.wasRead == true){
-                        console.log("okok");
                     }
                    }
                }
@@ -229,13 +268,21 @@ class Chat extends React.Component{
             }
         }
 
+
+        mouseOverSendButton(){
+            document.getElementById("messageInput").className = "messageInput_hover";
+        }
+        mouseOutSendButton(){
+            document.getElementById("messageInput").className ="messageInput";
+        }
+
     render() {
         return (
              <div className="chat">
                  <div className="messages">{this.state.messages}</div>
                  <div className="messageSender">
-                <textarea name="" id="messageInput" cols="60" rows="2" className="messageInput" placeholder = "Write a message..."></textarea>
-                <button className="sendButton" onClick = {this.sendMessage}>></button>
+                <textarea name="" id="messageInput" cols="60" rows="2" className="messageInput" id ="messageInput" placeholder = "Write a message..."></textarea>
+                <button className="sendButton" onClick = {this.sendMessage} onMouseOver = {this.mouseOverSendButton} onMouseOut = {this.mouseOutSendButton}>></button>
                  </div>
              </div>
         );

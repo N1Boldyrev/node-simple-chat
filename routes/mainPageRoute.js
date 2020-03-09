@@ -3,6 +3,7 @@ const events = require("events");
 let emitter = new events.EventEmitter();
 module.exports = function(app, db, ObjectId, webSocket){
     let connectedUsers = [];
+    global.connectedUsers = connectedUsers;
    
     app.get('/', (req, res) => {
         res.render('main');
@@ -22,6 +23,7 @@ module.exports = function(app, db, ObjectId, webSocket){
             message = JSON.parse(message);
             if(message.operation == "User connect"){
                 connectedUsers.push({login: message.login, ws: ws});
+                global.connectedUsers = connectedUsers;
             }
             else if(message.operation == "Send message"){
                 const collection = db.db('MeChat').collection('messages');

@@ -1,5 +1,5 @@
 const bodyParser = require('./bodyParser');
-module.exports = function(app, db){
+module.exports = function(app, db, webSocket){
     app.get('/',(req,res,next) =>{
         if(req.cookies.login != undefined && req.cookies.login != ""){
             next();
@@ -8,6 +8,17 @@ module.exports = function(app, db){
             res.render('index');
     });
 
+
+    webSocket.on('connection', ws =>{
+        ws.on("message", message => {
+            message = JSON.parse(message);
+            if(message.operation == "New user"){
+                for(let key in global.connectedUsers){
+                    global.connectedUsers[key].ws.send(JSON.stringify({operation: "New user"}));
+                }
+            }
+        })
+    });
 
     app.post('/signUp', bodyParser.jsonParser,(req, res) =>{
         let user = {login: req.body.login, password: req.body.password};
