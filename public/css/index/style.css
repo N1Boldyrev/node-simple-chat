@@ -79,9 +79,11 @@ button{
 
 .signUp{
     padding-top: 20px;
+    
 }
 .signUp a{
     color: #828282;
+    border-bottom: 2px solid #828282;
     transition: linear 0.3s;
 }
 

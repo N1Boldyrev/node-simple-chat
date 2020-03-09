@@ -376,28 +376,31 @@ function (_React$Component3) {
         sender: loginSplit[1],
         messageText: messageText.value
       };
-      postData('/sendMessage', sendObj).then(function (data) {
-        id = data.id;
-        tmpMessageList.push(React.createElement("div", {
-          key: id,
-          id: id,
-          className: "message unread"
-        }, React.createElement("div", {
-          className: "messageUsername"
-        }, loginSplit[1]), React.createElement("div", {
-          className: "messageText"
-        }, messageText.value)));
-        sendObj.operation = "Send message";
-        sendObj.id = id;
 
-        _this8.state.socket.send(JSON.stringify(sendObj));
+      if (this.props.otherUser != "") {
+        postData('/sendMessage', sendObj).then(function (data) {
+          id = data.id;
+          tmpMessageList.push(React.createElement("div", {
+            key: id,
+            id: id,
+            className: "message unread"
+          }, React.createElement("div", {
+            className: "messageUsername"
+          }, loginSplit[1]), React.createElement("div", {
+            className: "messageText"
+          }, messageText.value)));
+          sendObj.operation = "Send message";
+          sendObj.id = id;
 
-        _this8.setState({
-          messages: tmpMessageList
+          _this8.state.socket.send(JSON.stringify(sendObj));
+
+          _this8.setState({
+            messages: tmpMessageList
+          });
+
+          messageText.value = '';
         });
-
-        messageText.value = '';
-      });
+      }
     }
   }, {
     key: "keyboardInput",

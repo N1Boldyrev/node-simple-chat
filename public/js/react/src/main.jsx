@@ -248,6 +248,8 @@ class Chat extends React.Component{
             sender: loginSplit[1], 
             messageText: messageText.value
         }
+        if(this.props.otherUser != ""){
+        
         postData('/sendMessage',sendObj).then(data =>{
             id = data.id;
             tmpMessageList.push(<div key = {id} id = {id} className = "message unread">
@@ -263,6 +265,7 @@ class Chat extends React.Component{
         messageText.value = '';
         })
         }
+    }
 
         keyboardInput(event){
             if(event.key == 'Enter' && this.props.otherUser != "" && document.getElementById("messageInput").value != '')
