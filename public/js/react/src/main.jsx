@@ -1,5 +1,8 @@
-let loginSplit = document.cookie.split(';');
-loginSplit = loginSplit[0].split('=');
+let tmp_loginSplit = document.cookie.split(';');
+let loginSplit = tmp_loginSplit[0].split('=');
+if(loginSplit[0] != "login"){
+    loginSplit = tmp_loginSplit[1].split('=');
+}
 let tmpMessageList = [];
 
 class Headder extends React.Component{
@@ -16,6 +19,7 @@ class Headder extends React.Component{
 
     signOut(){
         document.cookie = "login=";
+        document.cookie ="destination=";
         document.location.href = "/";
     }
 

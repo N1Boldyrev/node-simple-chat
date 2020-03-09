@@ -20,8 +20,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var loginSplit = document.cookie.split(';');
-loginSplit = loginSplit[0].split('=');
+var tmp_loginSplit = document.cookie.split(';');
+var loginSplit = tmp_loginSplit[0].split('=');
+
+if (loginSplit[0] != "login") {
+  loginSplit = tmp_loginSplit[1].split('=');
+}
+
 var tmpMessageList = [];
 
 var Headder =
@@ -46,12 +51,12 @@ function (_React$Component) {
     key: "signOut",
     value: function signOut() {
       document.cookie = "login=";
+      document.cookie = "destination=";
       document.location.href = "/";
     }
   }, {
     key: "mouseOverHeadder",
     value: function mouseOverHeadder() {
-      console.log("ok");
       document.getElementsByClassName('headder')[0].id = "headder_hover";
       document.getElementsByClassName('logo')[0].id = "logo_hover";
       document.getElementsByClassName('signOut')[0].id = "signOut_hover";
@@ -250,7 +255,6 @@ function (_React$Component3) {
 
         _this6.state.socket.onmessage = function (message) {
           var data = JSON.parse(message.data);
-          console.log(data);
 
           if (data.operation == "Send message" && _this6.props.otherUser == data.sender) {
             //Если пользователь на странице диалога с отправителем сообщения
@@ -281,8 +285,6 @@ function (_React$Component3) {
           } else if (data.operation == "New user") {
             _this6.props.getUsersList();
           } else if (data.operation == "Was read") {
-            console.log("ok");
-
             if (data.reader == _this6.props.otherUser) {
               document.getElementById(data.id).className = "message";
 
@@ -294,9 +296,7 @@ function (_React$Component3) {
                   operation: "Was read",
                   wasRead: true
                 }));
-              } else if (data.wasRead == true) {
-                console.log("okok");
-              }
+              } else if (data.wasRead == true) {}
             }
           }
         };
