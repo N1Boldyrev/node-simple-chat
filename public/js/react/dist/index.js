@@ -91,8 +91,8 @@ function (_React$Component) {
         }
 
         message.innerText = errorMsg;
-        message.className = 'errorMessage';
-        message.hidden = false;
+        message.className = "errorMessage";
+        message.style.opacity = 1;
         return false;
       } else return true;
     }
@@ -111,18 +111,19 @@ function (_React$Component) {
           password: password.value
         }).then(function (data) {
           if (data.status == "already exists") {
-            message.className = 'errorMessage';
+            message.className = "errorMessage";
+            message.style.opacity = 1;
             message.innerText = 'User already exist';
             login.className = 'wrongInput';
             password.className = 'wrongInput';
           } else if (data.status == 'ok') {
-            message.className = 'successMessage';
+            message.className = "successMessage";
+            message.style.opacity = 1;
             message.innerText = 'You was rigistrated, try to sign in';
           } else throw new Error("Server error");
 
           login.value = '';
           password.value = '';
-          message.hidden = false;
 
           if (_this3.state.socketOpen == true) {
             _this3.state.socket.send(JSON.stringify({
@@ -147,11 +148,10 @@ function (_React$Component) {
           password: password.value
         }).then(function (data) {
           if (data.validation == false) {
-            message.className = 'errorMessage';
+            message.style.opacity = 1;
             message.innerText = 'Invalid Login or Password';
             login.value = '';
             password.value = '';
-            message.hidden = false;
           } else {
             document.location.href = '/';
           }
@@ -199,8 +199,8 @@ function (_React$Component) {
         onClick: this.signUp
       }, "Sign up")), React.createElement("div", {
         id: "message",
-        hidden: true
-      }));
+        className: "errorMessage"
+      }, "ERROR MSG HERE"));
     }
   }]);
 

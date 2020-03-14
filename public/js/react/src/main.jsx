@@ -39,6 +39,7 @@ class Headder extends React.Component{
             return (
                  <div className="headder" id = "headder">
                      <div className="logo" id = "logo" onMouseOver = {this.mouseOverHeadder} onMouseOut = {this.mouseOutHeadder}>MeChat</div>
+                     <div className="showUserList">&#9881;</div>
                      <div className="username">{loginSplit[1]}</div>
                      <div className="signOut" onClick = {this.signOut} id="signOut" onMouseOver = {this.mouseOverHeadder} onMouseOut = {this.mouseOutHeadder}>
                          <button>Sign out</button>
@@ -140,16 +141,11 @@ class Chat extends React.Component{
             readable : [1, 2 , 3]
         };
         this.sendMessage = this.sendMessage.bind(this);
-        this.keyboardInput = this.keyboardInput.bind(this);
         this.mouseOverSendButton = this.mouseOverSendButton.bind(this);
         this.mouseOutSendButton = this.mouseOutSendButton.bind(this);
     }
 
     componentDidMount(){
-        const messageTextArea = document.getElementById("messageInput");
-        messageTextArea.addEventListener("keydown", this.keyboardInput);
-
-
         this.state.socket.onopen = () =>{
             this.state.socket.send(JSON.stringify({login: loginSplit[1], operation: "User connect"}));
             this.state.socket.onmessage = message => {
@@ -248,7 +244,7 @@ class Chat extends React.Component{
             sender: loginSplit[1], 
             messageText: messageText.value
         }
-        if(this.props.otherUser != ""){
+        if(this.props.otherUser != "" && messageText.value != ""){
         
         postData('/sendMessage',sendObj).then(data =>{
             id = data.id;
@@ -266,14 +262,6 @@ class Chat extends React.Component{
         })
         }
     }
-
-        keyboardInput(event){
-            if(event.key == 'Enter' && this.props.otherUser != "" && document.getElementById("messageInput").value != '')
-                this.sendMessage();
-            else if(this.props.otherUser == "" && event.key == 'Enter'){
-                document.getElementById('messageInput').value = '';
-            }
-        }
 
 
         mouseOverSendButton(){

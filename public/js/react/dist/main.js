@@ -80,6 +80,8 @@ function (_React$Component) {
         onMouseOver: this.mouseOverHeadder,
         onMouseOut: this.mouseOutHeadder
       }, "MeChat"), React.createElement("div", {
+        className: "showUserList"
+      }, "\u2699"), React.createElement("div", {
         className: "username"
       }, loginSplit[1]), React.createElement("div", {
         className: "signOut",
@@ -233,7 +235,6 @@ function (_React$Component3) {
       readable: [1, 2, 3]
     };
     _this5.sendMessage = _this5.sendMessage.bind(_assertThisInitialized(_this5));
-    _this5.keyboardInput = _this5.keyboardInput.bind(_assertThisInitialized(_this5));
     _this5.mouseOverSendButton = _this5.mouseOverSendButton.bind(_assertThisInitialized(_this5));
     _this5.mouseOutSendButton = _this5.mouseOutSendButton.bind(_assertThisInitialized(_this5));
     return _this5;
@@ -243,9 +244,6 @@ function (_React$Component3) {
     key: "componentDidMount",
     value: function componentDidMount() {
       var _this6 = this;
-
-      var messageTextArea = document.getElementById("messageInput");
-      messageTextArea.addEventListener("keydown", this.keyboardInput);
 
       this.state.socket.onopen = function () {
         _this6.state.socket.send(JSON.stringify({
@@ -377,7 +375,7 @@ function (_React$Component3) {
         messageText: messageText.value
       };
 
-      if (this.props.otherUser != "") {
+      if (this.props.otherUser != "" && messageText.value != "") {
         postData('/sendMessage', sendObj).then(function (data) {
           id = data.id;
           tmpMessageList.push(React.createElement("div", {
@@ -400,13 +398,6 @@ function (_React$Component3) {
 
           messageText.value = '';
         });
-      }
-    }
-  }, {
-    key: "keyboardInput",
-    value: function keyboardInput(event) {
-      if (event.key == 'Enter' && this.props.otherUser != "" && document.getElementById("messageInput").value != '') this.sendMessage();else if (this.props.otherUser == "" && event.key == 'Enter') {
-        document.getElementById('messageInput').value = '';
       }
     }
   }, {
