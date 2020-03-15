@@ -40,10 +40,13 @@ function (_React$Component) {
     _classCallCheck(this, Headder);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Headder).call(this, props));
-    _this.state = {};
+    _this.state = {
+      hideUserList: true
+    };
     _this.signOut = _this.signOut.bind(_assertThisInitialized(_this));
     _this.mouseOverHeadder = _this.mouseOverHeadder.bind(_assertThisInitialized(_this));
     _this.mouseOutHeadder = _this.mouseOutHeadder.bind(_assertThisInitialized(_this));
+    _this.showUsersList = _this.showUsersList.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -69,19 +72,41 @@ function (_React$Component) {
       document.getElementsByClassName('signOut')[0].id = "signOut";
     }
   }, {
+    key: "showUsersList",
+    value: function showUsersList() {
+      var usersList = document.getElementsByClassName("usersList")[0];
+      var chat = document.getElementsByClassName("chat")[0];
+
+      if (this.state.hideUserList == true) {
+        chat.style.display = "none";
+        usersList.style.display = "flex";
+        this.setState({
+          hideUserList: false
+        });
+      } else if (this.state.hideUserList == false) {
+        usersList.style.display = "none";
+        chat.style.display = "inline";
+        this.setState({
+          hideUserList: true
+        });
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
       return React.createElement("div", {
         className: "headder",
         id: "headder"
       }, React.createElement("div", {
+        className: "showUserList"
+      }, React.createElement("button", {
+        onClick: this.showUsersList
+      }, "\u2699")), React.createElement("div", {
         className: "logo",
         id: "logo",
         onMouseOver: this.mouseOverHeadder,
         onMouseOut: this.mouseOutHeadder
       }, "MeChat"), React.createElement("div", {
-        className: "showUserList"
-      }, "\u2699"), React.createElement("div", {
         className: "username"
       }, loginSplit[1]), React.createElement("div", {
         className: "signOut",
@@ -112,7 +137,7 @@ function (_React$Component2) {
     _this2.state = {
       list: "",
       activeUser: "",
-      socket: new WebSocket('ws://localhost:3001')
+      socket: new WebSocket('ws://192.168.0.182:3001')
     };
     _this2.getUsersList = _this2.getUsersList.bind(_assertThisInitialized(_this2));
     return _this2;

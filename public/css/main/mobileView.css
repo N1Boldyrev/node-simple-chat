@@ -2,6 +2,183 @@
     body{
         padding: 0px;
         margin: 0px;
+        font-family: 'Roboto', sans-serif;
+    }
+    #root{
+        height: 100%;
+        width: 100%;
     }
 
+    button{
+    background-color: #A762E5;
+    border-radius: 3px;
+    border: none;
+    color: white;
+    transition: linear 0.3s;
+    }
+
+    .wrapper{
+        height: 100%;
+        width: 100%;
+    }
+
+    .headder{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        height: 10%;
+        padding-top: 10px;
+        border-bottom: 1px solid #BEBEBE;
+    }
+    .username{
+        display: none;
+    }
+    
+    .showUserList button{
+        font-size: 20px;
+        padding: 5px 10px;
+        
+    }
+
+    .showUserList button:hover{
+        background: #3AB4A8;
+    }
+
+    #logo{
+        font-family: 'Lobster', cursive;
+        font-size: 250%;
+        padding-left: 20px;
+        color: #A762E5;
+        transition: linear 0.3s;
+    }
+
+    #logo_hover{
+        font-family: 'Lobster', cursive;
+        font-size: 250%;
+        padding-left: 20px;
+        color: #3AB4A8;
+        transition: linear 0.3s;
+    }
+
+    #signOut button{
+        padding: 10px;
+        font-size: 15px;
+        transition: linear 0.3s;
+    }
+
+    
+    #signOut_hover button{
+        padding: 10px;
+        font-size: 15px;
+        transition: linear 0.3s;
+        background: #3AB4A8;
+    }
+
+
+    .messages{
+        border: none;
+        border-bottom: 1px solid #BEBEBE;
+        min-width: 100%;
+        max-width: 100%;
+        height: 75%;
+        word-wrap: break-word;
+        overflow: auto;
+    }
+
+    .messageCover{
+        padding-top: 45%;
+        text-align: center;
+        color: #717171;
+    }
+
+    .messageSender{
+        position: relative;
+        display: flex;
+        bottom: 0px;
+        padding: 0px 20px;
+        margin-top: 20px;
+        flex-direction: row;
+    }
+
+
+    .sendButton{
+        height: 40px;
+        width: 50px;
+        margin-left: 5px;
+        color: white;
+        transition: linear 0.3s;
+    }
+
+    .sendButton:hover{
+        background-color: #3AB4A8;
+        cursor: pointer;
+    }
+
+
+    .message{
+        padding: 10px;
+        padding-left: 20px;
+    }
+    
+    .messageUsername{
+        font-weight: 800;
+        color: #B34DEE;
+    }
+
+    .messageInput{
+        padding-top: 5px;
+        border: 2px solid #A762E5;
+        border-radius: 10px;
+        outline: none;
+        -moz-appearance: none;
+        overflow: auto;
+        padding-left: 10px;
+        resize: none;
+        font-family: 'Roboto', sans-serif;
+        transition: linear 0.3s;
+    }
+    
+    .messageInput_hover{
+        padding-top: 5px;
+        border: 2px solid #3AB4A8;
+        border-radius: 10px;
+        outline: none;
+        -moz-appearance: none;
+        overflow: auto;
+        padding-left: 10px;
+        resize: none;
+        font-family: 'Roboto', sans-serif;
+        transition: linear 0.3s;
+    }
+
+    .usersList{
+        display: none;
+        overflow: auto;
+        flex-direction: column;
+        align-items: center;
+        height: 75%;
+        text-align: center;
+    }
+
+        
+    .User{
+        padding: 10px 0;
+        width: 100%;
+    }
+
+    .User:hover{
+        background-color: #E5D5EE;
+        cursor: pointer;
+    }
+
+    .UserClicked{
+        padding: 10px 0;
+        width: 100%;
+        background:#CC93EE;
+        cursor: pointer;
+    }
+
+    .unread{
+        background: #E5D5EE;
+    }
 }
