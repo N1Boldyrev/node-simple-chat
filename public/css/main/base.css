@@ -1,4 +1,5 @@
 @import './desktopView.css';
+@import './mobileView.css';
 @import url('https://fonts.googleapis.com/css?family=Lobster|Roboto&display=swap');
 
 ::-webkit-scrollbar { /* 1 - скроллбар */

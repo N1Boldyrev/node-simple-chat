@@ -245,4 +245,8 @@ body{
     background: #E5D5EE;
 }
 
+.showUserList{
+    display: none;
+}
+
 }

@@ -58,8 +58,8 @@ class LoginScreen extends React.Component{
             }
 
                 message.innerText = errorMsg;
-                message.className = 'errorMessage';
-                message.hidden = false;
+                message.className = "errorMessage";
+                message.style.opacity = 1;
                 return false;
             }
                 else return true;
@@ -74,19 +74,20 @@ class LoginScreen extends React.Component{
             postData('/signUp', {login: login.value, password: password.value})
             .then(data => {
                 if(data.status == "already exists"){
-                    message.className = 'errorMessage';
+                    message.className = "errorMessage";
+                    message.style.opacity = 1;
                     message.innerText = 'User already exist';
                     login.className = 'wrongInput';
                     password.className = 'wrongInput';
                 }
                 else if(data.status == 'ok'){
-                    message.className = 'successMessage';
+                    message.className = "successMessage";
+                    message.style.opacity = 1;
                     message.innerText = 'You was rigistrated, try to sign in';
                 }
                 else throw new Error("Server error");
                 login.value = '';
                 password.value = '';
-                message.hidden = false;
 
                 if(this.state.socketOpen == true){
                     this.state.socket.send(JSON.stringify({operation: "New user"}));
@@ -104,11 +105,10 @@ class LoginScreen extends React.Component{
             postData('/signIn', {login: login.value, password: password.value})
             .then(data => {
                 if(data.validation == false){
-                    message.className = 'errorMessage';
+                    message.style.opacity = 1;
                     message.innerText = 'Invalid Login or Password';
                     login.value = '';
                     password.value = '';
-                    message.hidden = false;
                 }else{
                     document.location.href = '/';
                 }
@@ -135,7 +135,7 @@ class LoginScreen extends React.Component{
                  <br/>
                  <button className={this.state.button_id} onMouseOver = {this.mouseOver} onMouseOut = {this.mouseOut} onClick = {this.signIn}>Sign in</button>
                  <div className="signUp"><a onClick = {this.signUp}>Sign up</a></div>
-                 <div id="message" hidden = {true}></div>
+                 <div id="message" className = "errorMessage">ERROR MSG HERE</div>
              </div>
         );
     };
