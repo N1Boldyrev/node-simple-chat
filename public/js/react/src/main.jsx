@@ -147,6 +147,51 @@ class UsersLsit extends React.Component{
 }
 
 
+class PopUpMessage extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            message: props.message,
+            sender: props.sender,
+            show: false
+        }
+    }
+
+    componentDidUpdate(prevProps){
+        let popUp = document.getElementsByClassName('popUp')[0];
+        let timer;
+        if(this.props.sender !== prevProps.sender && this.props.message !== prevProps.message){
+            this.setState({
+                sender: this.props.sender,
+                message: this.props.message
+            });
+        }
+        else if(this.props.sender !== prevProps.sender){
+            this.setState({sender: this.props.sender});
+        }
+        else if(this.props.message !== prevProps.message){
+            this.setState({message: this.props.message});
+        }
+        if(this.state.show == false && this.state.sender != '' && this.state.message != ''){
+            popUp.style.display = 'inline';
+            this.setState({show: true});
+        }
+    }
+
+    render() {
+        return (
+             <div className="popUp">
+                 <div className="popUpSender">
+                    {this.state.sender}
+                 </div>
+                 <div className="popUpMessage">
+                     {this.state.message}
+                 </div>
+             </div>
+        );
+    }
+}
+
 class Chat extends React.Component{
     constructor(props){
         super(props);
@@ -154,7 +199,9 @@ class Chat extends React.Component{
             messages: <div className = "messageCover">The history of messages will be displayed here.</div>,
             destination:"",
             socket: props.socket,
-            readable : [1, 2 , 3]
+            readable : [1, 2 , 3],
+            popUpMsg: "",
+            popUpSender:"",
         };
         this.sendMessage = this.sendMessage.bind(this);
         this.mouseOverSendButton = this.mouseOverSendButton.bind(this);
@@ -185,6 +232,11 @@ class Chat extends React.Component{
 
                else if(data.operation == "Send message" && this.props.otherUser != data.sender){
                    document.getElementById(data.sender).className = "user unread";
+                   console.log(data.message);
+                   this.setState({
+                       popUpMsg: data.message,
+                       popUpSender: data.sender
+                   });
                }
 
                else if(data.operation == "New user"){
@@ -199,8 +251,6 @@ class Chat extends React.Component{
                         sender: data.reader, reader: data.sender, id: data.id , operation: "Was read", wasRead: true
                     }));
                 }
-                    else if(data.wasRead == true){
-                    }
                    }
                }
             };
@@ -295,6 +345,7 @@ class Chat extends React.Component{
                 <textarea name="" id="messageInput" cols="60" rows="2" className="messageInput" id ="messageInput" placeholder = "Write a message..."></textarea>
                 <button className="sendButton" onClick = {this.sendMessage} onMouseOver = {this.mouseOverSendButton} onMouseOut = {this.mouseOutSendButton}>></button>
                  </div>
+                 <PopUpMessage sender = {this.state.popUpSender} message = {this.state.popUpMsg}/>
              </div>
         );
     }

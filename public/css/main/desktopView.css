@@ -249,4 +249,30 @@ body{
     display: none;
 }
 
+.popUp{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    height: 20%;
+    border-radius: 3px;
+    width: 16.5%;
+    background: rgba(167,98,229, 0.5);;
+    z-index: 10;
+    padding-left: 10px;
+    padding-top: 10px;
+    margin-bottom: 7%;
+
+    transition: linear 0.3s;
+
+    display:none;
+}
+
+.popUpSender{
+    color: white;
+}
+.popUpMessage{
+    color: #BEBEBE;
+    padding-top: 10px;
+}
+
 }
