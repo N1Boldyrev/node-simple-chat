@@ -5,7 +5,7 @@ class LoginScreen extends React.Component{
             button_id : "signIn",
             logo_id: "logo",
             form_id: "loginForm",
-            socket: new WebSocket('ws://localhost:3001'),
+            socket: new WebSocket('ws://192.168.0.182:3001'),
             socketOpen: false
         };
 

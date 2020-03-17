@@ -144,7 +144,7 @@ function (_React$Component2) {
     _this2.state = {
       list: "",
       activeUser: "",
-      socket: new WebSocket('ws://localhost:3001')
+      socket: new WebSocket('ws://192.168.0.182:3001')
     };
     _this2.getUsersList = _this2.getUsersList.bind(_assertThisInitialized(_this2));
     return _this2;
@@ -523,6 +523,8 @@ function (_React$Component4) {
 
           _this11.setState({
             messages: tmpMessageList
+          }, function () {
+            document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
           });
 
           messageText.value = '';

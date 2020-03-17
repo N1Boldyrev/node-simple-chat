@@ -77,7 +77,7 @@ class UsersLsit extends React.Component{
         this.state = {
             list:"", 
             activeUser: "",
-            socket: new WebSocket('ws://localhost:3001')
+            socket: new WebSocket('ws://192.168.0.182:3001')
         };
 
         this.getUsersList = this.getUsersList.bind(this);
@@ -348,7 +348,10 @@ class Chat extends React.Component{
             sendObj.id = id;
             this.state.socket.send(JSON.stringify(sendObj));
 
-        this.setState({messages: tmpMessageList});
+
+        this.setState({messages: tmpMessageList}, () =>{
+            document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
+        });
         messageText.value = '';
         })
         }

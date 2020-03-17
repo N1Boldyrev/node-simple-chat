@@ -256,18 +256,17 @@ body{
     height: 20%;
     border-radius: 3px;
     width: 16.5%;
-    background: rgba(167,98,229, 0.5);;
+    background: rgba(167,98,229, 0.5);
     z-index: 10;
     padding-left: 10px;
     padding-top: 10px;
     margin-bottom: 7%;
 
     transition: linear 0.3s;
-
+    pointer-events: none;
     word-wrap: break-word;
     overflow: auto;
-    text-overflow: clip;
-
+    text-overflow: ellipsis;
     opacity: 0;
 }
 
