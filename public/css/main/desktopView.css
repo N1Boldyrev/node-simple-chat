@@ -264,15 +264,29 @@ body{
 
     transition: linear 0.3s;
 
-    display:none;
+    word-wrap: break-word;
+    overflow: auto;
+    text-overflow: clip;
+
+    opacity: 0;
 }
 
 .popUpSender{
+    padding-top: 3px;
     color: white;
 }
+
 .popUpMessage{
     color: #BEBEBE;
-    padding-top: 10px;
+    padding-top: 5px;
+    padding-right: 3px;
+    font-size: 15px;
+    text-overflow: clip;
+}
+
+.popUp_newMessage{
+    color: #BEBEBE;
+    font-size: 10px;
 }
 
 }

@@ -155,37 +155,56 @@ class PopUpMessage extends React.Component{
             sender: props.sender,
             show: false
         }
+        this.sender ='';
+        this.message = '';
+    }
+
+    popUpInner(sender, message){
+        
+    }
+
+    showPopUp(){
+        let popUp = document.getElementById('popUp');
+        this.sender = this.state.sender;
+        this.message = this.state.message;
+        popUp.style.opacity = 1;
+        this.setState({show: true}, () => {
+            let timer = setTimeout(() => {
+                popUp.style.opacity = 0;
+                this.setState({show: false}, () => clearTimeout(timer));
+            }, 4000);
+        });
     }
 
     componentDidUpdate(prevProps){
-        let popUp = document.getElementsByClassName('popUp')[0];
-        let timer;
-        if(this.props.sender !== prevProps.sender && this.props.message !== prevProps.message){
+        if(this.props.message !== prevProps.message || this.props.sender !== prevProps.sender){
             this.setState({
-                sender: this.props.sender,
-                message: this.props.message
+                message: this.props.message,
+                sender: this.props.sender
+            },() => {
+                if(this.state.sender != '' && this.state.message != '' && prevProps.message !== this.props.message || prevProps.sender != this.props.sender){
+                    if(this.state.show == false){
+                     this.showPopUp();
+                 }
+                 else if(this.state.show == true){
+                     setTimeout(() => {
+                         this.showPopUp();
+                     }, 3000);
+                 }
+                }       
             });
-        }
-        else if(this.props.sender !== prevProps.sender){
-            this.setState({sender: this.props.sender});
-        }
-        else if(this.props.message !== prevProps.message){
-            this.setState({message: this.props.message});
-        }
-        if(this.state.show == false && this.state.sender != '' && this.state.message != ''){
-            popUp.style.display = 'inline';
-            this.setState({show: true});
         }
     }
 
     render() {
         return (
-             <div className="popUp">
+             <div className="popUp" id = 'popUp'>
+                 <div className="popUp_newMessage">New message from...</div>
                  <div className="popUpSender">
-                    {this.state.sender}
+                    {this.sender}
                  </div>
                  <div className="popUpMessage">
-                     {this.state.message}
+                     {this.message}
                  </div>
              </div>
         );
@@ -232,7 +251,6 @@ class Chat extends React.Component{
 
                else if(data.operation == "Send message" && this.props.otherUser != data.sender){
                    document.getElementById(data.sender).className = "user unread";
-                   console.log(data.message);
                    this.setState({
                        popUpMsg: data.message,
                        popUpSender: data.sender
