@@ -29,6 +29,13 @@ if (loginSplit[0] != "login") {
 
 var tmpMessageList = [];
 
+function Audio(props) {
+  return React.createElement("audio", {
+    src: "messageSound.mp3",
+    id: "messageSound"
+  });
+}
+
 var Headder =
 /*#__PURE__*/
 function (_React$Component) {
@@ -400,6 +407,8 @@ function (_React$Component4) {
               popUpMsg: data.message,
               popUpSender: data.sender
             });
+
+            document.getElementById('messageSound').play();
           } else if (data.operation == "New user") {
             _this9.props.getUsersList();
           } else if (data.operation == "Was read") {
@@ -564,4 +573,4 @@ function (_React$Component4) {
 
 ReactDOM.render(React.createElement("div", {
   className: "wrapper"
-}, React.createElement(Headder, null), React.createElement(UsersLsit, null)), document.getElementById("root"));
+}, React.createElement(Audio, null), React.createElement(Headder, null), React.createElement(UsersLsit, null)), document.getElementById("root"));

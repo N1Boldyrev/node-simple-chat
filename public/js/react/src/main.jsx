@@ -5,6 +5,12 @@ if(loginSplit[0] != "login"){
 }
 let tmpMessageList = [];
 
+function Audio(props){
+    return(
+        <audio src="messageSound.mp3" id = 'messageSound'></audio>
+    )
+}
+
 class Headder extends React.Component{
     constructor(props){
         super(props);
@@ -255,6 +261,7 @@ class Chat extends React.Component{
                        popUpMsg: data.message,
                        popUpSender: data.sender
                    });
+                   document.getElementById('messageSound').play();
                }
 
                else if(data.operation == "New user"){
@@ -372,6 +379,7 @@ class Chat extends React.Component{
 
 ReactDOM.render(
     <div className = "wrapper">
+        <Audio/>
         <Headder/>
         <UsersLsit/>
     </div>,

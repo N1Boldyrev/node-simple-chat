@@ -149,6 +149,7 @@ function (_React$Component) {
         }).then(function (data) {
           if (data.validation == false) {
             message.style.opacity = 1;
+            message.className = "errorMessage";
             message.innerText = 'Invalid Login or Password';
             login.value = '';
             password.value = '';
