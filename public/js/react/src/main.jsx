@@ -77,10 +77,10 @@ class UsersLsit extends React.Component{
         this.state = {
             list:"", 
             activeUser: "",
-            socket: new WebSocket('ws://192.168.0.182:3001')
+            socket: new WebSocket('ws://localhost:3001')
         };
 
-        this.getUsersList = this.getUsersList.bind(this);
+        this.userChange = this.userChange.bind(this);
     }
 
     componentDidMount(){
@@ -133,7 +133,7 @@ class UsersLsit extends React.Component{
 }
 
     userChange(id){
-        if(this.state.activeUser != ""){
+        if(this.state.activeUser != "" && id != ""){
             document.getElementById(this.state.activeUser).className = "User";
         }
             document.getElementById(id).className = "UserClicked";
@@ -146,7 +146,7 @@ class UsersLsit extends React.Component{
                  <div className="usersList">   
                    {this.state.list}
                 </div>
-                 <Chat otherUser = {this.state.activeUser}  socket = {this.state.socket} getUsersList = {this.getUsersList}/>
+                 <Chat otherUser = {this.state.activeUser}  socket = {this.state.socket} userChange = {this.userChange}/>
             </div>
         );
     }
@@ -163,10 +163,6 @@ class PopUpMessage extends React.Component{
         }
         this.sender ='';
         this.message = '';
-    }
-
-    popUpInner(sender, message){
-        
     }
 
     showPopUp(){
@@ -204,7 +200,7 @@ class PopUpMessage extends React.Component{
 
     render() {
         return (
-             <div className="popUp" id = 'popUp'>
+             <div className="popUp" id = 'popUp' onClick = {() => this.props.userChange(this.sender)}>
                  <div className="popUp_newMessage">New message from...</div>
                  <div className="popUpSender">
                     {this.sender}
@@ -286,6 +282,7 @@ class Chat extends React.Component{
         if(this.props.otherUser !== prevProps.otherUser){
             this.getMessages();
         }
+        document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
     }
 
     getMessages(){
@@ -373,7 +370,7 @@ class Chat extends React.Component{
                 <textarea name="" id="messageInput" cols="60" rows="2" className="messageInput" id ="messageInput" placeholder = "Write a message..."></textarea>
                 <button className="sendButton" onClick = {this.sendMessage} onMouseOver = {this.mouseOverSendButton} onMouseOut = {this.mouseOutSendButton}>></button>
                  </div>
-                 <PopUpMessage sender = {this.state.popUpSender} message = {this.state.popUpMsg}/>
+                 <PopUpMessage sender = {this.state.popUpSender} message = {this.state.popUpMsg} userChange = {this.props.userChange}/>
              </div>
         );
     }

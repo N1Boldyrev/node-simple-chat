@@ -263,11 +263,14 @@ body{
     margin-bottom: 7%;
 
     transition: linear 0.3s;
-    pointer-events: none;
     word-wrap: break-word;
     overflow: auto;
     text-overflow: ellipsis;
     opacity: 0;
+}
+
+.popUp:hover{
+    background: rgba(167,98,229, 0.9);
 }
 
 .popUpSender{
