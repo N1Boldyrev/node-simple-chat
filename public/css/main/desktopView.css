@@ -228,6 +228,10 @@ body{
     transition: linear 0.3s;
 }
 
+.messageInput:focus{
+    border: 2px solid #3AB4A8;
+}
+
 .messageInput_hover{
     padding-top: 5px;
     border: 2px solid #3AB4A8;

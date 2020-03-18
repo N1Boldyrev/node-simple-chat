@@ -361,6 +361,7 @@ function (_React$Component4) {
     _this9.sendMessage = _this9.sendMessage.bind(_assertThisInitialized(_this9));
     _this9.mouseOverSendButton = _this9.mouseOverSendButton.bind(_assertThisInitialized(_this9));
     _this9.mouseOutSendButton = _this9.mouseOutSendButton.bind(_assertThisInitialized(_this9));
+    _this9.readKey = _this9.readKey.bind(_assertThisInitialized(_this9));
     return _this9;
   }
 
@@ -430,6 +431,9 @@ function (_React$Component4) {
           }
         };
       };
+
+      document.addEventListener("keydown", this.readKey);
+      document.addEventListener("keyup", this.keyUp);
     }
   }, {
     key: "componentDidUpdate",
@@ -439,6 +443,29 @@ function (_React$Component4) {
       }
 
       document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
+    }
+  }, {
+    key: "readKey",
+    value: function readKey(event) {
+      var input = document.getElementById("messageInput");
+      var button = document.getElementsByClassName('sendButton')[0];
+      input.focus();
+
+      if (event.code == "Enter" && input.value != '') {
+        event.preventDefault();
+        this.sendMessage();
+        button.style.background = '#3AB4A8';
+      } else if (event.code == "Enter") {
+        event.preventDefault();
+        button.style.background = '#3AB4A8';
+      }
+    }
+  }, {
+    key: "keyUp",
+    value: function keyUp(event) {
+      if (event.code == "Enter") {
+        document.getElementsByClassName('sendButton')[0].style.background = '#A762E5';
+      }
     }
   }, {
     key: "getMessages",
@@ -529,9 +556,9 @@ function (_React$Component4) {
             messages: tmpMessageList
           }, function () {
             document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
-          });
 
-          messageText.value = '';
+            messageText.value = '';
+          });
         });
       }
     }

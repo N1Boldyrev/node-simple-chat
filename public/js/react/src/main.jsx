@@ -227,6 +227,7 @@ class Chat extends React.Component{
         this.sendMessage = this.sendMessage.bind(this);
         this.mouseOverSendButton = this.mouseOverSendButton.bind(this);
         this.mouseOutSendButton = this.mouseOutSendButton.bind(this);
+        this.readKey = this.readKey.bind(this);
     }
 
     componentDidMount(){
@@ -276,6 +277,9 @@ class Chat extends React.Component{
                }
             };
         }
+
+        document.addEventListener("keydown", this.readKey);
+        document.addEventListener("keyup", this.keyUp);
     }
 
     componentDidUpdate(prevProps){
@@ -283,6 +287,27 @@ class Chat extends React.Component{
             this.getMessages();
         }
         document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
+    }
+
+    readKey(event){
+        let input = document.getElementById("messageInput");
+        let button = document.getElementsByClassName('sendButton')[0];
+        input.focus();
+        if(event.code == "Enter" && input.value != ''){
+            event.preventDefault();
+            this.sendMessage();
+            button.style.background = '#3AB4A8';
+        }
+        else if(event.code == "Enter"){
+            event.preventDefault();
+            button.style.background = '#3AB4A8';
+        }
+    }
+
+    keyUp(event){
+        if(event.code == "Enter"){
+            document.getElementsByClassName('sendButton')[0].style.background = '#A762E5';
+        }
     }
 
     getMessages(){
@@ -348,8 +373,8 @@ class Chat extends React.Component{
 
         this.setState({messages: tmpMessageList}, () =>{
             document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
+            messageText.value = '';
         });
-        messageText.value = '';
         })
         }
     }
