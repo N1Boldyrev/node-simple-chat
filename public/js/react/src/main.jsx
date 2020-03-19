@@ -3,6 +3,7 @@ let loginSplit = tmp_loginSplit[0].split('=');
 if(loginSplit[0] != "login"){
     loginSplit = tmp_loginSplit[1].split('=');
 }
+let lastActiveUser = tmp_loginSplit[1].split('=');
 let tmpMessageList = [];
 
 function Audio(props){
@@ -27,6 +28,7 @@ class Headder extends React.Component{
     signOut(){
         document.cookie = "login=";
         document.cookie ="destination=";
+        document.cookie ="lastActiveUser=";
         document.location.href = "/";
     }
 
@@ -98,12 +100,18 @@ class UsersLsit extends React.Component{
             }
             this.setState({list: userList});
 
+            if(lastActiveUser[0] == ' lastActiveUser'){ //При входе на страницу открывает последний диалог
+               this.userChange(lastActiveUser[1]);
+            }
+
             //Проверка на присутствие непрочитанных сообщений у пользователя
             let unread = postData('/findMessages', {login: loginSplit[1]})
             .then(data => {
+                let sender = '';
+                console.log(data);
+                if(data.response != "Empty"){
                 for(let key in data){
                     if(data[key].sender != loginSplit[1]){
-                        let sender;
                         if(data[key].users[0] == loginSplit[1]){
                             sender = data[key].users[1];
                         }
@@ -111,6 +119,7 @@ class UsersLsit extends React.Component{
                     }
                     document.getElementById(sender).className = "user unread";
                 }
+            }
             })
         });
     }
@@ -138,6 +147,7 @@ class UsersLsit extends React.Component{
         }
             document.getElementById(id).className = "UserClicked";
             this.setState({activeUser: id});
+            document.cookie=`lastActiveUser=${id}`;
     }
 
     render() {

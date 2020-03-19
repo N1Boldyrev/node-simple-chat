@@ -27,6 +27,7 @@ if (loginSplit[0] != "login") {
   loginSplit = tmp_loginSplit[1].split('=');
 }
 
+var lastActiveUser = tmp_loginSplit[1].split('=');
 var tmpMessageList = [];
 
 function Audio(props) {
@@ -62,6 +63,7 @@ function (_React$Component) {
     value: function signOut() {
       document.cookie = "login=";
       document.cookie = "destination=";
+      document.cookie = "lastActiveUser=";
       document.location.href = "/";
     }
   }, {
@@ -172,22 +174,30 @@ function (_React$Component2) {
 
         _this3.setState({
           list: userList
-        }); //Проверка на присутствие непрочитанных сообщений у пользователя
+        });
+
+        if (lastActiveUser[0] == ' lastActiveUser') {
+          //При входе на страницу открывает последний диалог
+          _this3.userChange(lastActiveUser[1]);
+        } //Проверка на присутствие непрочитанных сообщений у пользователя
 
 
         var unread = postData('/findMessages', {
           login: loginSplit[1]
         }).then(function (data) {
-          for (var _key in data) {
-            if (data[_key].sender != loginSplit[1]) {
-              var _sender = void 0;
+          var sender = '';
+          console.log(data);
 
-              if (data[_key].users[0] == loginSplit[1]) {
-                _sender = data[_key].users[1];
-              } else _sender = data[_key].users[0];
+          if (data.response != "Empty") {
+            for (var _key in data) {
+              if (data[_key].sender != loginSplit[1]) {
+                if (data[_key].users[0] == loginSplit[1]) {
+                  sender = data[_key].users[1];
+                } else sender = data[_key].users[0];
+              }
+
+              document.getElementById(sender).className = "user unread";
             }
-
-            document.getElementById(sender).className = "user unread";
           }
         });
       });
@@ -228,6 +238,7 @@ function (_React$Component2) {
       this.setState({
         activeUser: id
       });
+      document.cookie = "lastActiveUser=".concat(id);
     }
   }, {
     key: "render",
