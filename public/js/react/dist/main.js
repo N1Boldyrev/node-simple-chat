@@ -27,7 +27,15 @@ if (loginSplit[0] != "login") {
   loginSplit = tmp_loginSplit[1].split('=');
 }
 
+var lastActiveUser = tmp_loginSplit[1].split('=');
 var tmpMessageList = [];
+
+function Audio(props) {
+  return React.createElement("audio", {
+    src: "messageSound.mp3",
+    id: "messageSound"
+  });
+}
 
 var Headder =
 /*#__PURE__*/
@@ -55,6 +63,7 @@ function (_React$Component) {
     value: function signOut() {
       document.cookie = "login=";
       document.cookie = "destination=";
+      document.cookie = "lastActiveUser=";
       document.location.href = "/";
     }
   }, {
@@ -137,9 +146,9 @@ function (_React$Component2) {
     _this2.state = {
       list: "",
       activeUser: "",
-      socket: new WebSocket('ws://192.168.0.182:3001')
+      socket: new WebSocket('ws://localhost:3001')
     };
-    _this2.getUsersList = _this2.getUsersList.bind(_assertThisInitialized(_this2));
+    _this2.userChange = _this2.userChange.bind(_assertThisInitialized(_this2));
     return _this2;
   }
 
@@ -165,22 +174,30 @@ function (_React$Component2) {
 
         _this3.setState({
           list: userList
-        }); //Проверка на присутствие непрочитанных сообщений у пользователя
+        });
+
+        if (lastActiveUser[0] == ' lastActiveUser') {
+          //При входе на страницу открывает последний диалог
+          _this3.userChange(lastActiveUser[1]);
+        } //Проверка на присутствие непрочитанных сообщений у пользователя
 
 
         var unread = postData('/findMessages', {
           login: loginSplit[1]
         }).then(function (data) {
-          for (var _key in data) {
-            if (data[_key].sender != loginSplit[1]) {
-              var _sender = void 0;
+          var sender = '';
+          console.log(data);
 
-              if (data[_key].users[0] == loginSplit[1]) {
-                _sender = data[_key].users[1];
-              } else _sender = data[_key].users[0];
+          if (data.response != "Empty") {
+            for (var _key in data) {
+              if (data[_key].sender != loginSplit[1]) {
+                if (data[_key].users[0] == loginSplit[1]) {
+                  sender = data[_key].users[1];
+                } else sender = data[_key].users[0];
+              }
+
+              document.getElementById(sender).className = "user unread";
             }
-
-            document.getElementById(sender).className = "user unread";
           }
         });
       });
@@ -213,7 +230,7 @@ function (_React$Component2) {
   }, {
     key: "userChange",
     value: function userChange(id) {
-      if (this.state.activeUser != "") {
+      if (this.state.activeUser != "" && id != "") {
         document.getElementById(this.state.activeUser).className = "User";
       }
 
@@ -221,6 +238,7 @@ function (_React$Component2) {
       this.setState({
         activeUser: id
       });
+      document.cookie = "lastActiveUser=".concat(id);
     }
   }, {
     key: "render",
@@ -232,7 +250,7 @@ function (_React$Component2) {
       }, this.state.list), React.createElement(Chat, {
         otherUser: this.state.activeUser,
         socket: this.state.socket,
-        getUsersList: this.getUsersList
+        userChange: this.userChange
       }));
     }
   }]);
@@ -240,46 +258,139 @@ function (_React$Component2) {
   return UsersLsit;
 }(React.Component);
 
-var Chat =
+var PopUpMessage =
 /*#__PURE__*/
 function (_React$Component3) {
-  _inherits(Chat, _React$Component3);
+  _inherits(PopUpMessage, _React$Component3);
+
+  function PopUpMessage(props) {
+    var _this5;
+
+    _classCallCheck(this, PopUpMessage);
+
+    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(PopUpMessage).call(this, props));
+    _this5.state = {
+      message: props.message,
+      sender: props.sender,
+      show: false
+    };
+    _this5.sender = '';
+    _this5.message = '';
+    return _this5;
+  }
+
+  _createClass(PopUpMessage, [{
+    key: "showPopUp",
+    value: function showPopUp() {
+      var _this6 = this;
+
+      var popUp = document.getElementById('popUp');
+      this.sender = this.state.sender;
+      this.message = this.state.message;
+      popUp.style.opacity = 1;
+      this.setState({
+        show: true
+      }, function () {
+        var timer = setTimeout(function () {
+          popUp.style.opacity = 0;
+
+          _this6.setState({
+            show: false
+          }, function () {
+            return clearTimeout(timer);
+          });
+        }, 4000);
+      });
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps) {
+      var _this7 = this;
+
+      if (this.props.message !== prevProps.message || this.props.sender !== prevProps.sender) {
+        this.setState({
+          message: this.props.message,
+          sender: this.props.sender
+        }, function () {
+          if (_this7.state.sender != '' && _this7.state.message != '' && prevProps.message !== _this7.props.message || prevProps.sender != _this7.props.sender) {
+            if (_this7.state.show == false) {
+              _this7.showPopUp();
+            } else if (_this7.state.show == true) {
+              setTimeout(function () {
+                _this7.showPopUp();
+              }, 3000);
+            }
+          }
+        });
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this8 = this;
+
+      return React.createElement("div", {
+        className: "popUp",
+        id: "popUp",
+        onClick: function onClick() {
+          return _this8.props.userChange(_this8.sender);
+        }
+      }, React.createElement("div", {
+        className: "popUp_newMessage"
+      }, "New message from..."), React.createElement("div", {
+        className: "popUpSender"
+      }, this.sender), React.createElement("div", {
+        className: "popUpMessage"
+      }, this.message));
+    }
+  }]);
+
+  return PopUpMessage;
+}(React.Component);
+
+var Chat =
+/*#__PURE__*/
+function (_React$Component4) {
+  _inherits(Chat, _React$Component4);
 
   function Chat(props) {
-    var _this5;
+    var _this9;
 
     _classCallCheck(this, Chat);
 
-    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(Chat).call(this, props));
-    _this5.state = {
+    _this9 = _possibleConstructorReturn(this, _getPrototypeOf(Chat).call(this, props));
+    _this9.state = {
       messages: React.createElement("div", {
         className: "messageCover"
       }, "The history of messages will be displayed here."),
       destination: "",
       socket: props.socket,
-      readable: [1, 2, 3]
+      readable: [1, 2, 3],
+      popUpMsg: "",
+      popUpSender: ""
     };
-    _this5.sendMessage = _this5.sendMessage.bind(_assertThisInitialized(_this5));
-    _this5.mouseOverSendButton = _this5.mouseOverSendButton.bind(_assertThisInitialized(_this5));
-    _this5.mouseOutSendButton = _this5.mouseOutSendButton.bind(_assertThisInitialized(_this5));
-    return _this5;
+    _this9.sendMessage = _this9.sendMessage.bind(_assertThisInitialized(_this9));
+    _this9.mouseOverSendButton = _this9.mouseOverSendButton.bind(_assertThisInitialized(_this9));
+    _this9.mouseOutSendButton = _this9.mouseOutSendButton.bind(_assertThisInitialized(_this9));
+    _this9.readKey = _this9.readKey.bind(_assertThisInitialized(_this9));
+    return _this9;
   }
 
   _createClass(Chat, [{
     key: "componentDidMount",
     value: function componentDidMount() {
-      var _this6 = this;
+      var _this10 = this;
 
       this.state.socket.onopen = function () {
-        _this6.state.socket.send(JSON.stringify({
+        _this10.state.socket.send(JSON.stringify({
           login: loginSplit[1],
           operation: "User connect"
         }));
 
-        _this6.state.socket.onmessage = function (message) {
+        _this10.state.socket.onmessage = function (message) {
           var data = JSON.parse(message.data);
 
-          if (data.operation == "Send message" && _this6.props.otherUser == data.sender) {
+          if (data.operation == "Send message" && _this10.props.otherUser == data.sender) {
             //Если пользователь на странице диалога с отправителем сообщения
             var newMessage = React.createElement("div", {
               className: "message",
@@ -292,7 +403,7 @@ function (_React$Component3) {
             }, data.message));
             tmpMessageList.push(newMessage);
 
-            _this6.state.socket.send(JSON.stringify({
+            _this10.state.socket.send(JSON.stringify({
               sender: loginSplit[1],
               reader: data.sender,
               id: data.id,
@@ -300,30 +411,40 @@ function (_React$Component3) {
               wasRead: false
             }));
 
-            _this6.setState({
+            _this10.setState({
               messages: tmpMessageList
             });
-          } else if (data.operation == "Send message" && _this6.props.otherUser != data.sender) {
+          } else if (data.operation == "Send message" && _this10.props.otherUser != data.sender) {
             document.getElementById(data.sender).className = "user unread";
+
+            _this10.setState({
+              popUpMsg: data.message,
+              popUpSender: data.sender
+            });
+
+            document.getElementById('messageSound').play();
           } else if (data.operation == "New user") {
-            _this6.props.getUsersList();
+            _this10.props.getUsersList();
           } else if (data.operation == "Was read") {
-            if (data.reader == _this6.props.otherUser) {
+            if (data.reader == _this10.props.otherUser) {
               document.getElementById(data.id).className = "message";
 
               if (data.wasRead == false) {
-                _this6.state.socket.send(JSON.stringify({
+                _this10.state.socket.send(JSON.stringify({
                   sender: data.reader,
                   reader: data.sender,
                   id: data.id,
                   operation: "Was read",
                   wasRead: true
                 }));
-              } else if (data.wasRead == true) {}
+              }
             }
           }
         };
       };
+
+      document.addEventListener("keydown", this.readKey);
+      document.addEventListener("keyup", this.keyUp);
     }
   }, {
     key: "componentDidUpdate",
@@ -331,11 +452,36 @@ function (_React$Component3) {
       if (this.props.otherUser !== prevProps.otherUser) {
         this.getMessages();
       }
+
+      document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
+    }
+  }, {
+    key: "readKey",
+    value: function readKey(event) {
+      var input = document.getElementById("messageInput");
+      var button = document.getElementsByClassName('sendButton')[0];
+      input.focus();
+
+      if (event.code == "Enter" && input.value != '') {
+        event.preventDefault();
+        this.sendMessage();
+        button.style.background = '#3AB4A8';
+      } else if (event.code == "Enter") {
+        event.preventDefault();
+        button.style.background = '#3AB4A8';
+      }
+    }
+  }, {
+    key: "keyUp",
+    value: function keyUp(event) {
+      if (event.code == "Enter") {
+        document.getElementsByClassName('sendButton')[0].style.background = '#A762E5';
+      }
     }
   }, {
     key: "getMessages",
     value: function getMessages() {
-      var _this7 = this;
+      var _this11 = this;
 
       var destination = this.props.otherUser;
       tmpMessageList = [];
@@ -343,7 +489,7 @@ function (_React$Component3) {
       var wasRead = '';
       var messages = getData('/messages').then(function (data) {
         if (data.response == "Empty") {
-          _this7.setState({
+          _this11.setState({
             messages: React.createElement("div", {
               className: "messageCover"
             }, "The history of messages will be displayed here.")
@@ -358,7 +504,7 @@ function (_React$Component3) {
                   id: data[key]._id
                 });
 
-                _this7.state.socket.send(JSON.stringify({
+                _this11.state.socket.send(JSON.stringify({
                   sender: data[key].sender,
                   reader: loginSplit[1],
                   id: data[key]._id,
@@ -379,7 +525,7 @@ function (_React$Component3) {
             }, data[key].message)));
           }
 
-          _this7.setState({
+          _this11.setState({
             messages: tmpMessageList
           });
         }
@@ -388,7 +534,7 @@ function (_React$Component3) {
   }, {
     key: "sendMessage",
     value: function sendMessage() {
-      var _this8 = this;
+      var _this12 = this;
 
       var messageText = document.getElementById('messageInput');
       var destination = this.props.otherUser;
@@ -415,13 +561,15 @@ function (_React$Component3) {
           sendObj.operation = "Send message";
           sendObj.id = id;
 
-          _this8.state.socket.send(JSON.stringify(sendObj));
+          _this12.state.socket.send(JSON.stringify(sendObj));
 
-          _this8.setState({
+          _this12.setState({
             messages: tmpMessageList
-          });
+          }, function () {
+            document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
 
-          messageText.value = '';
+            messageText.value = '';
+          });
         });
       }
     }
@@ -457,7 +605,11 @@ function (_React$Component3) {
         onClick: this.sendMessage,
         onMouseOver: this.mouseOverSendButton,
         onMouseOut: this.mouseOutSendButton
-      }, ">")));
+      }, ">")), React.createElement(PopUpMessage, {
+        sender: this.state.popUpSender,
+        message: this.state.popUpMsg,
+        userChange: this.props.userChange
+      }));
     }
   }]);
 
@@ -466,4 +618,4 @@ function (_React$Component3) {
 
 ReactDOM.render(React.createElement("div", {
   className: "wrapper"
-}, React.createElement(Headder, null), React.createElement(UsersLsit, null)), document.getElementById("root"));
+}, React.createElement(Audio, null), React.createElement(Headder, null), React.createElement(UsersLsit, null)), document.getElementById("root"));

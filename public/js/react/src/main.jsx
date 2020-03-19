@@ -3,7 +3,14 @@ let loginSplit = tmp_loginSplit[0].split('=');
 if(loginSplit[0] != "login"){
     loginSplit = tmp_loginSplit[1].split('=');
 }
+let lastActiveUser = tmp_loginSplit[1].split('=');
 let tmpMessageList = [];
+
+function Audio(props){
+    return(
+        <audio src="messageSound.mp3" id = 'messageSound'></audio>
+    )
+}
 
 class Headder extends React.Component{
     constructor(props){
@@ -21,6 +28,7 @@ class Headder extends React.Component{
     signOut(){
         document.cookie = "login=";
         document.cookie ="destination=";
+        document.cookie ="lastActiveUser=";
         document.location.href = "/";
     }
 
@@ -74,7 +82,7 @@ class UsersLsit extends React.Component{
             socket: new WebSocket('ws://localhost:3001')
         };
 
-        this.getUsersList = this.getUsersList.bind(this);
+        this.userChange = this.userChange.bind(this);
     }
 
     componentDidMount(){
@@ -92,12 +100,18 @@ class UsersLsit extends React.Component{
             }
             this.setState({list: userList});
 
+            if(lastActiveUser[0] == ' lastActiveUser'){ //При входе на страницу открывает последний диалог
+               this.userChange(lastActiveUser[1]);
+            }
+
             //Проверка на присутствие непрочитанных сообщений у пользователя
             let unread = postData('/findMessages', {login: loginSplit[1]})
             .then(data => {
+                let sender = '';
+                console.log(data);
+                if(data.response != "Empty"){
                 for(let key in data){
                     if(data[key].sender != loginSplit[1]){
-                        let sender;
                         if(data[key].users[0] == loginSplit[1]){
                             sender = data[key].users[1];
                         }
@@ -105,6 +119,7 @@ class UsersLsit extends React.Component{
                     }
                     document.getElementById(sender).className = "user unread";
                 }
+            }
             })
         });
     }
@@ -127,11 +142,12 @@ class UsersLsit extends React.Component{
 }
 
     userChange(id){
-        if(this.state.activeUser != ""){
+        if(this.state.activeUser != "" && id != ""){
             document.getElementById(this.state.activeUser).className = "User";
         }
             document.getElementById(id).className = "UserClicked";
             this.setState({activeUser: id});
+            document.cookie=`lastActiveUser=${id}`;
     }
 
     render() {
@@ -140,12 +156,72 @@ class UsersLsit extends React.Component{
                  <div className="usersList">   
                    {this.state.list}
                 </div>
-                 <Chat otherUser = {this.state.activeUser}  socket = {this.state.socket} getUsersList = {this.getUsersList}/>
+                 <Chat otherUser = {this.state.activeUser}  socket = {this.state.socket} userChange = {this.userChange}/>
             </div>
         );
     }
 }
 
+
+class PopUpMessage extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            message: props.message,
+            sender: props.sender,
+            show: false
+        }
+        this.sender ='';
+        this.message = '';
+    }
+
+    showPopUp(){
+        let popUp = document.getElementById('popUp');
+        this.sender = this.state.sender;
+        this.message = this.state.message;
+        popUp.style.opacity = 1;
+        this.setState({show: true}, () => {
+            let timer = setTimeout(() => {
+                popUp.style.opacity = 0;
+                this.setState({show: false}, () => clearTimeout(timer));
+            }, 4000);
+        });
+    }
+
+    componentDidUpdate(prevProps){
+        if(this.props.message !== prevProps.message || this.props.sender !== prevProps.sender){
+            this.setState({
+                message: this.props.message,
+                sender: this.props.sender
+            },() => {
+                if(this.state.sender != '' && this.state.message != '' && prevProps.message !== this.props.message || prevProps.sender != this.props.sender){
+                    if(this.state.show == false){
+                     this.showPopUp();
+                 }
+                 else if(this.state.show == true){
+                     setTimeout(() => {
+                         this.showPopUp();
+                     }, 3000);
+                 }
+                }       
+            });
+        }
+    }
+
+    render() {
+        return (
+             <div className="popUp" id = 'popUp' onClick = {() => this.props.userChange(this.sender)}>
+                 <div className="popUp_newMessage">New message from...</div>
+                 <div className="popUpSender">
+                    {this.sender}
+                 </div>
+                 <div className="popUpMessage">
+                     {this.message}
+                 </div>
+             </div>
+        );
+    }
+}
 
 class Chat extends React.Component{
     constructor(props){
@@ -154,11 +230,14 @@ class Chat extends React.Component{
             messages: <div className = "messageCover">The history of messages will be displayed here.</div>,
             destination:"",
             socket: props.socket,
-            readable : [1, 2 , 3]
+            readable : [1, 2 , 3],
+            popUpMsg: "",
+            popUpSender:"",
         };
         this.sendMessage = this.sendMessage.bind(this);
         this.mouseOverSendButton = this.mouseOverSendButton.bind(this);
         this.mouseOutSendButton = this.mouseOutSendButton.bind(this);
+        this.readKey = this.readKey.bind(this);
     }
 
     componentDidMount(){
@@ -185,6 +264,11 @@ class Chat extends React.Component{
 
                else if(data.operation == "Send message" && this.props.otherUser != data.sender){
                    document.getElementById(data.sender).className = "user unread";
+                   this.setState({
+                       popUpMsg: data.message,
+                       popUpSender: data.sender
+                   });
+                   document.getElementById('messageSound').play();
                }
 
                else if(data.operation == "New user"){
@@ -199,17 +283,40 @@ class Chat extends React.Component{
                         sender: data.reader, reader: data.sender, id: data.id , operation: "Was read", wasRead: true
                     }));
                 }
-                    else if(data.wasRead == true){
-                    }
                    }
                }
             };
         }
+
+        document.addEventListener("keydown", this.readKey);
+        document.addEventListener("keyup", this.keyUp);
     }
 
     componentDidUpdate(prevProps){
         if(this.props.otherUser !== prevProps.otherUser){
             this.getMessages();
+        }
+        document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
+    }
+
+    readKey(event){
+        let input = document.getElementById("messageInput");
+        let button = document.getElementsByClassName('sendButton')[0];
+        input.focus();
+        if(event.code == "Enter" && input.value != ''){
+            event.preventDefault();
+            this.sendMessage();
+            button.style.background = '#3AB4A8';
+        }
+        else if(event.code == "Enter"){
+            event.preventDefault();
+            button.style.background = '#3AB4A8';
+        }
+    }
+
+    keyUp(event){
+        if(event.code == "Enter"){
+            document.getElementsByClassName('sendButton')[0].style.background = '#A762E5';
         }
     }
 
@@ -273,8 +380,11 @@ class Chat extends React.Component{
             sendObj.id = id;
             this.state.socket.send(JSON.stringify(sendObj));
 
-        this.setState({messages: tmpMessageList});
-        messageText.value = '';
+
+        this.setState({messages: tmpMessageList}, () =>{
+            document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
+            messageText.value = '';
+        });
         })
         }
     }
@@ -295,6 +405,7 @@ class Chat extends React.Component{
                 <textarea name="" id="messageInput" cols="60" rows="2" className="messageInput" id ="messageInput" placeholder = "Write a message..."></textarea>
                 <button className="sendButton" onClick = {this.sendMessage} onMouseOver = {this.mouseOverSendButton} onMouseOut = {this.mouseOutSendButton}>></button>
                  </div>
+                 <PopUpMessage sender = {this.state.popUpSender} message = {this.state.popUpMsg} userChange = {this.props.userChange}/>
              </div>
         );
     }
@@ -303,6 +414,7 @@ class Chat extends React.Component{
 
 ReactDOM.render(
     <div className = "wrapper">
+        <Audio/>
         <Headder/>
         <UsersLsit/>
     </div>,

@@ -228,6 +228,10 @@ body{
     transition: linear 0.3s;
 }
 
+.messageInput:focus{
+    border: 2px solid #3AB4A8;
+}
+
 .messageInput_hover{
     padding-top: 5px;
     border: 2px solid #3AB4A8;
@@ -247,6 +251,48 @@ body{
 
 .showUserList{
     display: none;
+}
+
+.popUp{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    height: 20%;
+    border-radius: 3px;
+    width: 16.5%;
+    background: rgba(167,98,229, 0.5);
+    z-index: 10;
+    padding-left: 10px;
+    padding-top: 10px;
+    margin-bottom: 7%;
+
+    transition: linear 0.3s;
+    word-wrap: break-word;
+    overflow: auto;
+    text-overflow: ellipsis;
+    opacity: 0;
+}
+
+.popUp:hover{
+    background: rgba(167,98,229, 0.9);
+}
+
+.popUpSender{
+    padding-top: 3px;
+    color: white;
+}
+
+.popUpMessage{
+    color: #BEBEBE;
+    padding-top: 5px;
+    padding-right: 3px;
+    font-size: 15px;
+    text-overflow: clip;
+}
+
+.popUp_newMessage{
+    color: #BEBEBE;
+    font-size: 10px;
 }
 
 }
