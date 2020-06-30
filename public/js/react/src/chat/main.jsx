@@ -1,5 +1,8 @@
+import React, { Component } from 'react';
+import  ReactDOM  from 'react-dom';
 import { Headder } from './headder.jsx';
 import { UsersList } from './usersList.jsx';
+
 
 function Audio(props){
     return(
@@ -7,7 +10,7 @@ function Audio(props){
     )
 }
 
-class Wrapper extends React.Component{
+class Wrapper extends Component{
     constructor(props){
         super(props);
         this.state = {

@@ -1,4 +1,6 @@
-export class PopUpMessage extends React.Component{
+import React, { Component } from 'react';
+
+export class PopUpMessage extends Component{
     constructor(props){
         super(props);
         this.state = {

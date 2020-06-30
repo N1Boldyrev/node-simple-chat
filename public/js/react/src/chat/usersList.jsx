@@ -1,6 +1,8 @@
+import React, { Component } from 'react';
 import { Chat } from './chat.jsx';
+import {postData, getData} from  '../../../fetch.js';
 
-export class UsersList extends React.Component{
+export class UsersList extends Component{
     constructor(props){
         super(props);
         this.state = {

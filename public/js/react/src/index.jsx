@@ -1,4 +1,8 @@
-class LoginScreen extends React.Component{
+import React, { Component } from 'react';
+import  ReactDOM  from 'react-dom';
+import { postData } from '../../fetch.js' ;
+
+class LoginScreen extends Component{
     constructor(props){
         super(props);
         this.state = {

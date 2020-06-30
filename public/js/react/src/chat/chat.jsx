@@ -1,8 +1,10 @@
+import React, { Component } from 'react';
 import { PopUpMessage } from './popUpMessage.jsx';
+import {postData, getData} from  '../../../fetch.js';
 
 let tmpMessageList = [];
 
-export class Chat extends React.Component{
+export class Chat extends Component{
     constructor(props){
         super(props);
         this.state = {

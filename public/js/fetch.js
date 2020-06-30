@@ -1,4 +1,4 @@
-function postData(url = '', data = {}) {
+export function postData(url = '', data = {}) {
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -9,7 +9,7 @@ function postData(url = '', data = {}) {
     .then(response => response.json()); // парсит JSON ответ в Javascript объект
 }
 
-function getData(url){
+export function getData(url){
         return fetch(url)
         .then(response => response.json());
 }
