@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname , 'public'))); // Отвечает з
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-MongoClient.connect(dbUrl, (err, database) => {
+MongoClient.connect(dbUrl,{useNewUrlParser: true, useUnifiedTopology: true}, (err, database) => {
     if(err) return console.log(err);
     require('./routes/route')(app, database,webSocketServer);
     require('./routes/mainPageRoute')(app,database, ObjectId, webSocketServer);

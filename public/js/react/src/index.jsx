@@ -44,16 +44,16 @@ class LoginScreen extends React.Component{
                 let errorMsg = '';
 
                 if(login.value == '' && password.value == ''){
-                    errorMsg = 'Login and password fields are empty';
+                    errorMsg = 'Неверные логин и пароль';
                     login.className = 'wrongInput';
                     password.className = 'wrongInput';
                 }
                 else if(login.value == ''){
-                    errorMsg = 'Login field is epmpty or incorrect';
+                    errorMsg = 'Неверный логин';
                     login.className = 'wrongInput';
             }
                 else{ 
-                    errorMsg = 'Password field is empty or incorrect';
+                    errorMsg = 'Неверный пароль';
                     password.className = 'wrongInput';
             }
 
@@ -76,14 +76,14 @@ class LoginScreen extends React.Component{
                 if(data.status == "already exists"){
                     message.className = "errorMessage";
                     message.style.opacity = 1;
-                    message.innerText = 'User already exist';
+                    message.innerText = 'Такой пользователь уже зарегистрирован';
                     login.className = 'wrongInput';
                     password.className = 'wrongInput';
                 }
                 else if(data.status == 'ok'){
                     message.className = "successMessage";
                     message.style.opacity = 1;
-                    message.innerText = 'You was rigistrated, try to sign in';
+                    message.innerText = 'Вы были зарегистрированы, попробуйте войти';
                 }
                 else throw new Error("Server error");
                 login.value = '';
@@ -107,7 +107,7 @@ class LoginScreen extends React.Component{
                 if(data.validation == false){
                     message.style.opacity = 1;
                     message.className = "errorMessage";
-                    message.innerText = 'Invalid Login or Password';
+                    message.innerText = 'Неверный логин или пароль';
                     login.value = '';
                     password.value = '';
                 }else{
@@ -129,13 +129,13 @@ class LoginScreen extends React.Component{
         return (
              <div id={this.state.form_id}>
                  <div className={this.state.logo_id}>MeChat</div>
-                 <div id="login_text">Login</div>
+                 <div id="login_text">Логин</div>
                  <input type="text" name="" id="login" autoComplete = 'off' className = 'login' onChange = {this.inputValChanged.bind(this,'login','login')}/>
-                 <div id='password_text'>Password</div>
+                 <div id='password_text'>Пароль</div>
                  <input type="password" name="" id="password" autoComplete = 'off' className = 'password' onChange = {this.inputValChanged.bind(this,'password','password')}/>
                  <br/>
-                 <button className={this.state.button_id} onMouseOver = {this.mouseOver} onMouseOut = {this.mouseOut} onClick = {this.signIn}>Sign in</button>
-                 <div className="signUp"><a onClick = {this.signUp}>Sign up</a></div>
+                 <button className={this.state.button_id} onMouseOver = {this.mouseOver} onMouseOut = {this.mouseOut} onClick = {this.signIn}>Войти</button>
+                 <div className="signUp"><a onClick = {this.signUp}>Регистрация</a></div>
                  <div id="message" className = "errorMessage">ERROR MSG HERE</div>
              </div>
         );

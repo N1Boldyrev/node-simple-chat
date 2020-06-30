@@ -192,16 +192,29 @@ body{
     height: 40px;
     width: 40px;
     margin-left: 5px;
-    background-color: #A762E5;
+    background-color: white;
     border-radius: 3px;
     border: none;
     color: white;
     transition: linear 0.3s;
 }
 
+.sendButton:focus{
+    outline: none;
+}
+
+svg{
+    fill:#A762E5;
+    transition: linear 0.3s;
+}
+
+
 .sendButton:hover{
-    background-color: #3AB4A8;
     cursor: pointer;
+}
+
+.sendButton:hover > svg{
+    fill: #3AB4A8;
 }
 
 
