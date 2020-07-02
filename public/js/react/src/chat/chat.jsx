@@ -14,11 +14,14 @@ export class Chat extends Component{
             readable : [1, 2 , 3],
             popUpMsg: "",
             popUpSender:"",
+            typing: false,
+            
         };
         this.sendMessage = this.sendMessage.bind(this);
         this.mouseOverSendButton = this.mouseOverSendButton.bind(this);
         this.mouseOutSendButton = this.mouseOutSendButton.bind(this);
         this.readKey = this.readKey.bind(this);
+        this.typingDetection = this.typingDetection.bind(this);
     }
 
     componentDidMount(){
@@ -66,6 +69,16 @@ export class Chat extends Component{
                 }
                    }
                }
+               else if(data.operation == 'typing'){
+                   if(this.props.otherUser == data.sender){
+                       if(data.typing == true){
+                           document.getElementsByClassName('typingDetection')[0].style.display = 'block';
+                       }
+                       if(data.typing == false){
+                           document.getElementsByClassName('typingDetection')[0].style.display = 'none';
+                       }
+                   }
+               }
             };
         }
 
@@ -76,28 +89,29 @@ export class Chat extends Component{
     componentDidUpdate(prevProps){
         if(this.props.otherUser !== prevProps.otherUser){
             this.getMessages();
+            document.getElementsByClassName('typingDetection')[0].style.display = 'none';
         }
         document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
     }
 
     readKey(event){
         let input = document.getElementById("messageInput");
-        let button = document.getElementsByClassName('sendButton')[0];
+        let svg = document.getElementsByTagName('svg')[0];
         input.focus();
         if(event.code == "Enter" && input.value != ''){
             event.preventDefault();
             this.sendMessage();
-            button.style.background = '#3AB4A8';
+            svg.style.fill = '#3AB4A8';
         }
         else if(event.code == "Enter"){
             event.preventDefault();
-            button.style.background = '#3AB4A8';
+            svg .style.fill = '#3AB4A8';
         }
     }
 
     keyUp(event){
         if(event.code == "Enter"){
-            document.getElementsByClassName('sendButton')[0].style.background = '#A762E5';
+            document.getElementsByTagName('svg')[0].style.fill = '#A762E5';
         }
     }
 
@@ -162,9 +176,18 @@ export class Chat extends Component{
             this.state.socket.send(JSON.stringify(sendObj));
 
 
-        this.setState({messages: tmpMessageList}, () =>{
+        this.setState({messages: tmpMessageList, typing: false}, () =>{
             document.getElementsByClassName('messages')[0].scrollTop = document.getElementsByClassName('messages')[0].scrollHeight; //скролл сообщений в самый низ
             messageText.value = '';
+
+            let obj = { //Отправляем оповещение о конце набора сообщения вебсокету
+                destination: this.props.otherUser,
+                sender: this.props.loginSplit,
+                operation: 'typing',
+                typing: false
+            }
+            this.state.socket.send(JSON.stringify(obj));
+
         });
         })
         }
@@ -178,12 +201,33 @@ export class Chat extends Component{
             document.getElementById("messageInput").className ="messageInput";
         }
 
+        typingDetection(){ //Отслеживает, пишет ли пользователь сообщение
+            if(this.state.typing == false){
+                let obj = {
+                    destination: this.props.otherUser,
+                    sender: this.props.loginSplit,
+                    operation: 'typing',
+                    typing: true
+                }
+                this.setState({typing: true});
+                this.state.socket.send(JSON.stringify(obj));
+                setTimeout(() => {
+                    if(this.state.typing != false){ // Перепроверяем перед переключением, потому что может быть переключено в false после отправки сообщения
+                        this.setState({typing: false});
+                        obj.typing = false;
+                        this.state.socket.send(JSON.stringify(obj));
+                    }
+                }, 3000);
+            }
+        }
+
     render() {
         return (
              <div className="chat">
+                 <div className="chatHeadder"><span className="chatHeadderUser">{this.props.otherUser}</span><span className="typingDetection">набирает сообщение...</span></div>
                  <div className="messages">{this.state.messages}</div>
                  <div className="messageSender">
-                <textarea name="" id="messageInput" cols="60" rows="2" className="messageInput" id ="messageInput" placeholder = "Напишите сообщение..."></textarea>
+                <textarea name="" id="messageInput" cols="60" rows="2" className="messageInput" id ="messageInput" placeholder = "Напишите сообщение..." onInput = {this.typingDetection}></textarea>
                 <button className="sendButton" onClick = {this.sendMessage} onMouseOver = {this.mouseOverSendButton} onMouseOut = {this.mouseOutSendButton}>
                 
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 0l-6 22-8.129-7.239 7.802-8.234-10.458 7.227-7.215-1.754 24-12zm-15 16.668v7.332l3.258-4.431-3.258-2.901z"/></svg>

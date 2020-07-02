@@ -1,5 +1,6 @@
 const bodyParser = require('./bodyParser');
 const events = require("events");
+const { send } = require('process');
 let emitter = new events.EventEmitter();
 module.exports = function(app, db, ObjectId, webSocket){
     let connectedUsers = [];
@@ -42,6 +43,15 @@ module.exports = function(app, db, ObjectId, webSocket){
                     }
                     else if(connectedUsers[key].login == message.sender && message.wasRead == true){
                         sendObj.wasRead = true;
+                        connectedUsers[key].ws.send(JSON.stringify(sendObj));
+                    }
+                }
+            }
+
+            else if(message.operation == 'typing'){
+                let sendObj = {operation: 'typing', sender: message.sender, typing: message.typing};
+                for(let key in connectedUsers){
+                    if(connectedUsers[key].login == message.destination){
                         connectedUsers[key].ws.send(JSON.stringify(sendObj));
                     }
                 }
