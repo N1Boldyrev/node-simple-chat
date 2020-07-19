@@ -79,6 +79,21 @@ module.exports = function(app, db, ObjectId, webSocket){
             });
     });
 
+    app.post('/messagesNoCookies', bodyParser.jsonParser, (req, res) => {
+        let destination = req.body.destination;
+        let login = req.body.login;
+        let collection = db.db('MeChat').collection('messages');
+        let messages = collection.find({$and:[{users: destination}, {users: login}]});
+            messages.toArray((err, results) => {
+                if(results.length == 0){
+                    res.send({response:'Empty'});
+                }
+                else{
+                res.send(results); 
+        }
+            });
+    });
+
 
     app.post('/findMessages', bodyParser.jsonParser, (req, res) => {
         let user = req.body.login;

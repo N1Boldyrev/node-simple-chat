@@ -48,7 +48,7 @@ export class PopUpMessage extends Component{
     render() {
         return (
              <div className="popUp" id = 'popUp' onClick = {() => this.props.userChange(this.sender)}>
-                 <div className="popUp_newMessage">New message from...</div>
+                 <div className="popUp_newMessage">Новое сообщение от...</div>
                  <div className="popUpSender">
                     {this.sender}
                  </div>

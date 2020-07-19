@@ -12,6 +12,7 @@ export class UsersList extends Component{
         };
 
         this.userChange = this.userChange.bind(this);
+        this.getUsersList = this.getUsersList.bind(this);
     }
 
     componentDidMount(){
@@ -84,7 +85,7 @@ export class UsersList extends Component{
                  <div className="usersList">   
                    {this.state.list}
                 </div>
-                 <Chat loginSplit = {this.props.loginSplit} otherUser = {this.state.activeUser}  socket = {this.state.socket} userChange = {this.userChange}/>
+                 <Chat loginSplit = {this.props.loginSplit} otherUser = {this.state.activeUser}  socket = {this.state.socket} userChange = {this.userChange} getUsersList = {this.getUsersList}/>
             </div>
         );
     }
