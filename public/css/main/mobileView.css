@@ -105,13 +105,27 @@
         height: 40px;
         width: 50px;
         margin-left: 5px;
+        background-color: white;
         color: white;
         transition: linear 0.3s;
     }
 
+    .sendButton:focus{
+        outline: none;
+    }
+    
+    svg{
+        fill:#A762E5;
+        transition: linear 0.3s;
+    }
+    
+    
     .sendButton:hover{
-        background-color: #3AB4A8;
         cursor: pointer;
+    }
+    
+    .sendButton:hover > svg{
+        fill: #3AB4A8;
     }
 
 
@@ -212,5 +226,23 @@
 
     .popUpMessage{
         color: #BEBEBE;
+    }
+
+    .chatHeadder{
+        padding: 10px 0;
+        width: 100%;
+        border-bottom: 1px solid #BEBEBE;
+        display: flex;
+        flex-direction: row;
+    }
+    
+    .chatHeadderUser{
+        margin-left: 5px;
+    }
+    
+    .typingDetection{
+        margin-left: 5px;
+        text-align: center;
+        display: none;
     }
 }

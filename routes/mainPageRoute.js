@@ -1,5 +1,6 @@
 const bodyParser = require('./bodyParser');
 const events = require("events");
+const { send } = require('process');
 let emitter = new events.EventEmitter();
 module.exports = function(app, db, ObjectId, webSocket){
     let connectedUsers = [];
@@ -46,6 +47,15 @@ module.exports = function(app, db, ObjectId, webSocket){
                     }
                 }
             }
+
+            else if(message.operation == 'typing'){
+                let sendObj = {operation: 'typing', sender: message.sender, typing: message.typing};
+                for(let key in connectedUsers){
+                    if(connectedUsers[key].login == message.destination){
+                        connectedUsers[key].ws.send(JSON.stringify(sendObj));
+                    }
+                }
+            }
         });
         ws.on('close', () =>{
             for(let key in connectedUsers){
@@ -57,6 +67,21 @@ module.exports = function(app, db, ObjectId, webSocket){
     app.get('/messages', (req,res) => {
         let destination = req.cookies.destination;
         let login = req.cookies.login;
+        let collection = db.db('MeChat').collection('messages');
+        let messages = collection.find({$and:[{users: destination}, {users: login}]});
+            messages.toArray((err, results) => {
+                if(results.length == 0){
+                    res.send({response:'Empty'});
+                }
+                else{
+                res.send(results); 
+        }
+            });
+    });
+
+    app.post('/messagesNoCookies', bodyParser.jsonParser, (req, res) => {
+        let destination = req.body.destination;
+        let login = req.body.login;
         let collection = db.db('MeChat').collection('messages');
         let messages = collection.find({$and:[{users: destination}, {users: login}]});
             messages.toArray((err, results) => {

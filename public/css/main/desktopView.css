@@ -166,7 +166,7 @@ body{
     border-bottom: 1px solid #BEBEBE;
     min-width: 100%;
     max-width: 100%;
-    height: 90%;
+    height: 85%;
     word-wrap: break-word;
     overflow: auto;
 }
@@ -183,7 +183,7 @@ body{
     bottom: 0px;
     padding-left: 20%;
     padding-right: 15%;
-    margin-top: 20px;
+    margin-top: 10px;
     flex-direction: row;
 }
 
@@ -192,16 +192,29 @@ body{
     height: 40px;
     width: 40px;
     margin-left: 5px;
-    background-color: #A762E5;
+    background-color: white;
     border-radius: 3px;
     border: none;
     color: white;
     transition: linear 0.3s;
 }
 
+.sendButton:focus{
+    outline: none;
+}
+
+svg{
+    fill:#A762E5;
+    transition: linear 0.3s;
+}
+
+
 .sendButton:hover{
-    background-color: #3AB4A8;
     cursor: pointer;
+}
+
+.sendButton:hover > svg{
+    fill: #3AB4A8;
 }
 
 
@@ -293,6 +306,24 @@ body{
 .popUp_newMessage{
     color: #BEBEBE;
     font-size: 10px;
+}
+
+.chatHeadder{
+    padding: 10px 0;
+    width: 100%;
+    border-bottom: 1px solid #BEBEBE;
+    display: flex;
+    flex-direction: row;
+}
+
+.chatHeadderUser{
+    margin-left: 5px;
+}
+
+.typingDetection{
+    margin-left: 5px;
+    text-align: center;
+    display: none;
 }
 
 }
